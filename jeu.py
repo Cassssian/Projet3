@@ -1,0 +1,1632 @@
+import subprocess
+
+
+def installer_bibliotheques_si_besoin(bibliotheques : list[str]):
+    """
+    Vérifie si les bibliothèques sont installées et les installe si nécessaire.
+    bibliotheques: Liste des bibliothèques à installer
+    """
+    for lib in bibliotheques:
+                try:
+                    __import__(lib)
+                except ImportError:
+                    print(f"Installation de la bibliothèque {lib}...")
+                    subprocess.check_call(["pip", "install", lib])
+
+
+# Liste des bibliothèques à installer si elles ne sont pas déjà installées
+bibliotheques_a_installer = ["pyxel"]
+
+
+
+
+import pyxel
+import random
+import os
+import json
+import time
+from datetime import datetime
+
+
+
+
+class Particle:
+    def __init__(self, x, y, particle_type="gauge"):
+        self.x = x
+        self.y = y
+        if particle_type == "gauge":
+            self.vx = random.uniform(-1, 1)
+            self.vy = random.uniform(-1, 1)
+            self.color = random.choice([7, 9, 10])
+        else:  # bird particles
+            self.vx = random.uniform(-2, 2)
+            self.vy = random.uniform(-2, 2)
+            self.color = random.choice([12, 7, 9])
+        self.life = random.randint(10, 20)
+        self.type = particle_type
+
+
+class Save:
+    """
+    Classe pour la sauvegarde
+    """
+    def __init__(self, app):
+        """
+        Initialisation de la sauvegarde
+        """
+        self.__save_file = "sauvegarde.json"
+        self.__pyxel_egal_caca = app
+        self.scroll_position = 0
+        self.click_ignore = True
+
+
+    def sauvegarder(self) -> None:
+        """
+        Sauvegarde le score
+        --------------
+        """
+        now = datetime.now()
+        annee = now.year
+        mois = now.month
+        jour = now.day
+        heure = now.hour
+        minute = now.minute
+        secondes = now.second
+
+        try:
+            with open(self.__save_file, "r") as f:
+                scores: list[{str, int}] = json.load(f)
+                partie = scores['Partie'].max()
+        except FileNotFoundError:
+            scores: list[None] = []  # Si le fichier n'existe pas, commencer avec une liste vide
+            partie = 0
+        # Ajouter les nouvelles données
+        scores.append({"Partie": partie + 1, "Date": [jour, mois, annee, [heure, minute, secondes]], "Orbes" : [self.__pyxel_egal_caca.blue_orb, self.__pyxel_egal_caca.red_orb, self.__pyxel_egal_caca.green_orb], "Pos Pos_cam" :[[self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y], [self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y]], "Actual bird": self.__pyxel_egal_caca.actual_bird.to_dict() if hasattr(self.__pyxel_egal_caca.actual_bird, 'to_dict') else str(type(self.__pyxel_egal_caca.actual_bird)),"Unlocked" : [[item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock],[item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock_stele]],"Bird pos" : [[self.__pyxel_egal_caca.blue_bird.x,self.__pyxel_egal_caca.blue_bird.y],[self.__pyxel_egal_caca.red_bird.x,self.__pyxel_egal_caca.red_bird.y],[self.__pyxel_egal_caca.green_bird.x,self.__pyxel_egal_caca.green_bird.y]],"Stele pos" : [[self.__pyxel_egal_caca.stele.blue_x,self.__pyxel_egal_caca.stele.blue_y],[self.__pyxel_egal_caca.stele.red_x,self.__pyxel_egal_caca.stele.red_y],[self.__pyxel_egal_caca.stele.green_x,self.__pyxel_egal_caca.stele.green_y]]})
+        # Écrire les données mises à jour dans le fichier
+        with open(self.__save_file, "w") as f:
+            json.dump(scores, f, indent=1)
+    
+
+    def show_save(self):
+        # Draw background panel with original dimensions
+        pyxel.rect(30, 20, 196, 216, 5)
+        pyxel.rectb(30, 20, 196, 216, 7)
+        
+        # Draw title
+        title_x = 80
+        title_y = 60
+        for i, letter in enumerate("SAVES"):
+            self.__pyxel_egal_caca.draw_letter(letter, title_x + i * 20, title_y, 0.5)
+
+        try:
+            with open(self.__save_file, "r") as f:
+                saves = json.load(f)
+                
+            # Calculate scroll
+            max_visible_saves = 4  # Adjusted for smaller window
+            if not hasattr(self, 'scroll_position'):
+                self.scroll_position = 0
+                
+            if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.KEY_S):
+                self.scroll_position = min(len(saves) - max_visible_saves, self.scroll_position + 1)
+            if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.KEY_Z):
+                self.scroll_position = max(0, self.scroll_position - 1)
+                
+            # Draw save buttons with scroll
+            visible_saves = saves[self.scroll_position:self.scroll_position + max_visible_saves]
+            for i, save in enumerate(visible_saves):
+                button_y = 70 + i * 40
+                # Draw button background
+                date = save["Date"]
+                button_save = {"x": 40, "y": button_y, "w": 176, "h": 30}
+                self.__pyxel_egal_caca.draw_button(button_save, f"Save {save['Partie']} - {date[0]}/{date[1]}/{date[2]} a {date[3][0]}h {date[3][1]}min {date[3][2]}s")
+
+                if self.__pyxel_egal_caca.is_button_clicked(button_save):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and len(visible_saves) == 1:
+                                    self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
+                                    self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
+                                    self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
+                                    self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
+                                    self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
+                                    self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
+                                    self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
+                                    self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
+                                    self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
+                                    self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
+                                    self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
+                                    self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
+                                    self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
+                                    self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
+                                    self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
+                                    self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
+                                    self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
+                                    self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
+                                    self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
+                                    self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.mode = "game"
+
+                                elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.click_ignore and len(visible_saves) != 1:
+                                    self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
+                                    self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
+                                    self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
+                                    self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
+                                    self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
+                                    self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
+                                    self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
+                                    self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
+                                    self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
+                                    self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
+                                    self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
+                                    self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
+                                    self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
+                                    self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
+                                    self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
+                                    self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
+                                    self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
+                                    self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
+                                    self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
+                                    self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.mode = "game"
+
+                                elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.click_ignore and len(visible_saves) != 1:
+                                    self.click_ignore = False
+                        
+            # Draw scroll indicators if needed
+            if self.scroll_position > 0:
+                high_button = {"x": 217, "y": 69, "w": 8, "h": 9}
+                self.__pyxel_egal_caca.draw_button(high_button, "    ")
+                if self.__pyxel_egal_caca.is_button_clicked(high_button):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                    self.scroll_position = max(0, self.scroll_position - 1)
+                pyxel.tri(
+                            220, 70,  # sommet du triangle
+                            218, 75,  # coin gauche
+                            222, 75,  # coin droit
+                            7  # couleur blanche
+                        )
+            if self.scroll_position + max_visible_saves < len(saves):
+
+                high_button = {"x": 217, "y": 212, "w": 8, "h": 9}
+                self.__pyxel_egal_caca.draw_button(high_button, "    ")
+                if self.__pyxel_egal_caca.is_button_clicked(high_button):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                    self.scroll_position = min(len(saves) - max_visible_saves, self.scroll_position + 1)
+                pyxel.tri(
+                            220, 219,  # sommet inversé
+                            218, 214,  # coin gauche
+                            222, 214,  # coin droit
+                            7  # couleur blanche
+                        )
+            
+            # Back button
+            back_button = {"x": 140, "y": 30, "w": 80, "h": 20}
+            self.__pyxel_egal_caca.draw_button(back_button, "Retour")
+            if self.__pyxel_egal_caca.is_button_clicked(back_button):
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    self.__pyxel_egal_caca.mode = "menu"
+                
+        except:
+            pyxel.text(80, 100, "Pas de sauvegarde trouvee", 7)
+            pyxel.text(70, 110, "Veuillez effectuer une partie", 7)
+
+            launch_button = {"x": 90, "y": 125, "w": 80, "h": 20}
+            self.__pyxel_egal_caca.draw_button(launch_button, "Lancer")
+            if self.__pyxel_egal_caca.is_button_clicked(launch_button):
+                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                self.__pyxel_egal_caca.mode = "game"
+
+            back_button = {"x": 90, "y": 200, "w": 80, "h": 20}
+            self.__pyxel_egal_caca.draw_button(back_button, "Retour")
+            if self.__pyxel_egal_caca.is_button_clicked(back_button):
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    self.__pyxel_egal_caca.mode = "menu"
+
+    def deserialisation(self, classe):
+        if classe == "Bird1":
+            return self.__pyxel_egal_caca.blue_bird
+        elif classe == "Bird2":
+            return self.__pyxel_egal_caca.red_bird
+        elif classe == "Bird3":
+            return self.__pyxel_egal_caca.green_bird
+
+
+
+class App:
+    """
+    Classe pour le jeu
+    """
+    def __init__(self):
+        """
+        Initialisation de l'application
+        """
+
+        # ============= INIT ================
+        self.SCREEN_WIDTH = 256
+        self.SCREEN_HEIGHT = 256
+        self.map_width = 256 * 8
+        self.map_height = 300
+        self.save = "sauvegarde.json"
+        # ========== END ===================
+
+        # ======================= JEU =========================================
+        self.x = 0
+        self.y = 0
+        self.COLLIDERS = [(5, 0), (4, 1), (5, 1), (6, 0), (6, 1), (7, 0), (7, 1), (5, 2), (5, 3), (6, 2), (6, 3), (7, 2), (7, 3), (5, 4), (5, 5), (6, 4), (6, 5), (7, 4), (7, 5), (0, 5)]
+        self.special_colliders = [(1, 0)]
+        self.mort_colliders = [(0, 3), (1, 3), (2, 3), (3, 3)]
+        self.portail_colliders = [(1, 10)]
+        self.bird1_frame = 0
+        self.bird2_frame = 0
+        self.bird3_frame = 0
+        self.blue_orb = 0
+        self.red_orb = 0
+        self.green_orb = 0
+        self.camera_x = 0
+        self.camera_y = 0
+        self.error_message = ""
+        self.error_timer = 0
+        # ================== END ===========================
+
+        # ============== ANIMATIONS ==========================
+        self.flying_bird_pos = [50, 20]
+        self.walking_bird1_pos = [150, 64]
+        self.walking_bird2_pos = [190, 15]
+        self.animation_timer = 0
+        self.animation_timer_2 = 0
+        # ==================== END ===========================
+
+        # ==================== MENU ==========================
+        self.mode = "menu"
+        self.button_start = {"x": 78, "y": 110, "w": 100, "h": 30}
+        self.sauvegarde = {"x": 78, "y": 150, "w": 100, "h": 30}
+        self.button_quit = {"x": 78, "y": 190, "w": 100, "h": 30}
+        # ==================== END ===========================
+
+        # ================= CLASSES ====================
+        self.stele = Stele()
+        self.save_class = Save(self)
+        self.blue_bird = Bird1(self, self.stele)
+        self.red_bird = Bird2(self, self.stele)
+        self.green_bird = Bird3(self, self.stele)
+        self.tombe = Tombe(self)
+        self.end = End(self)
+        # ================ END ======================
+
+        # ==== VARIABLE DE STOCK POUR LES FENETRES ET LE JEU =======
+        self.actual_bird = self.blue_bird
+        self.unlock = [self.blue_bird]
+        self.unlock_stele = [self.blue_bird]
+        self.hommage = []
+        # =============== END =======================
+        
+
+        
+        pyxel.init(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, "Projet 3")
+        pyxel.mouse(True)  # Affiche le curseur de la souris
+        pyxel.load("1.pyxres")
+        pyxel.run(self.update, self.draw)
+
+
+    def update_camera(self):
+        player_center_x = self.x + 4
+        player_center_y = self.y + 4
+        
+        # Calculate target camera position
+        target_camera_x = player_center_x - self.SCREEN_WIDTH // 2
+        target_camera_y = player_center_y - self.SCREEN_HEIGHT // 2
+        
+        # Update horizontal camera position based on player position
+        if player_center_x <= self.SCREEN_WIDTH // 2:
+            self.camera_x = 0
+        elif player_center_x >= self.map_width - self.SCREEN_WIDTH // 2:
+            self.camera_x = self.map_width - self.SCREEN_WIDTH - 8
+        else:
+            self.camera_x = target_camera_x
+
+        # Update vertical camera position based on player position    
+        if player_center_y <= self.SCREEN_HEIGHT // 2:
+            self.camera_y = 0
+        elif player_center_y >= self.SCREEN_HEIGHT // 2 and player_center_x <= 480:
+            self.camera_y = target_camera_y
+
+
+    def update(self):
+        if self.mode == "menu":
+            self.animation_timer += 1
+            self.animation_timer_2 += 1
+            if self.animation_timer > 15:
+                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                self.animation_timer = 0
+
+            if self.animation_timer_2 > 8:
+                # Update flying bird position
+                self.flying_bird_pos[0] += random.randint(-4, 2)
+                self.flying_bird_pos[1] += random.randint(-2, 4)
+                self.flying_bird_pos[0] = max(0, min(self.flying_bird_pos[0], 80))
+                self.flying_bird_pos[1] = max(0, min(self.flying_bird_pos[1], 45))
+
+                # Update walking birds position
+                self.walking_bird1_pos[0] += random.choice([random.randint(-2, 2),random.randint(-2, 2)])
+                self.walking_bird2_pos[0] -= random.choice([random.randint(-2, 2),random.randint(-2, 2)])
+                self.walking_bird1_pos[0] = max(self.SCREEN_WIDTH - 112, min(self.walking_bird1_pos[0], self.SCREEN_WIDTH - 8))
+                self.walking_bird2_pos[0] = max(self.SCREEN_WIDTH - 88, min(self.walking_bird2_pos[0], self.SCREEN_WIDTH - 30))
+
+                self.animation_timer_2 = 0
+            
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                if self.is_button_clicked(self.button_start):
+                    self.mode = "game"
+                elif self.is_button_clicked(self.sauvegarde):
+                    self.save_class.scroll_position = 0
+                    self.save_class.click_ignore = True
+                    self.mode = "save"
+                elif self.is_button_clicked(self.button_quit):
+                    pyxel.quit()
+        
+
+        elif self.mode == "save":
+            self.animation_timer += 1
+            self.animation_timer_2 += 1
+            if self.animation_timer > 15:
+                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                self.animation_timer = 0
+
+            if self.animation_timer_2 > 8:
+                # Update flying bird position
+                self.flying_bird_pos[0] += random.randint(-4, 2)
+                self.flying_bird_pos[1] += random.randint(-2, 4)
+                self.flying_bird_pos[0] = max(0, min(self.flying_bird_pos[0], 80))
+                self.flying_bird_pos[1] = max(0, min(self.flying_bird_pos[1], 45))
+
+                # Update walking birds position
+                self.walking_bird1_pos[0] += random.choice([random.randint(-2, 2),random.randint(-2, 2)])
+                self.walking_bird2_pos[0] -= random.choice([random.randint(-2, 2),random.randint(-2, 2)])
+                self.walking_bird1_pos[0] = max(self.SCREEN_WIDTH - 112, min(self.walking_bird1_pos[0], self.SCREEN_WIDTH - 8))
+                self.walking_bird2_pos[0] = max(self.SCREEN_WIDTH - 88, min(self.walking_bird2_pos[0], self.SCREEN_WIDTH - 30))
+
+                self.animation_timer_2 = 0
+
+
+        elif self.mode == "game":
+            self.x = self.actual_bird.x
+            self.y = self.actual_bird.y 
+            self.animation_timer_2 += 1
+
+            if self.animation_timer_2 > 12:
+                self.tombe.frame = (self.tombe.frame + 1) % 2
+                self.animation_timer_2 = 0
+
+            if pyxel.btn(pyxel.KEY_D) or pyxel.btn(pyxel.KEY_RIGHT):
+                self.actual_bird.direction = "droite"
+                self.actual_bird.right()
+                self.animation_timer += 1
+                if self.animation_timer > 15:
+                    self.actual_bird.frame = (self.actual_bird.frame + 1) % 2
+                    self.animation_timer = 0
+
+            if pyxel.btn(pyxel.KEY_C):
+                if self.actual_bird.check_collision_below(self.actual_bird.y):
+                    if self.error_timer > 0:
+                        self.error_timer = 0
+                    self.mode = "bird_select"
+
+            if pyxel.btn(pyxel.KEY_Q) or pyxel.btn(pyxel.KEY_LEFT):
+                self.actual_bird.direction = "gauche"
+                self.actual_bird.left()
+                self.animation_timer += 1
+                if self.animation_timer > 15:
+                    self.actual_bird.frame = (self.actual_bird.frame + 1) % 2
+                    self.animation_timer = 0
+                    
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.actual_bird.jump()  # Make the blue bird jump
+                pyxel.play(0, 11)
+
+            if pyxel.btnp(pyxel.KEY_P) and self.actual_bird.check_collision_below(self.actual_bird.y):
+                self.mode = "place_stele"
+
+            if pyxel.btnp(pyxel.KEY_R) and self.actual_bird.check_collision_below(self.actual_bird.y):
+                self.mode = "pause"
+
+            self.actual_bird.update()
+            
+            self.tombe.check_collision_with_stele(self.actual_bird)  # Appelle la vérification de collision avec la tombe
+            self.tombe.check_homage(self.actual_bird)  # Appelle la vérification de l'hommage
+            self.tombe.check_bird()
+            
+            self.end.detect(self.blue_orb, self.red_orb, self.green_orb, self.blue_bird, self.red_bird, self.green_bird, self.stele)
+
+            pyxel.camera(self.camera_x, self.camera_y)
+
+            if self.actual_bird.y >= self.SCREEN_HEIGHT + 450:
+                self.mode = "mort"
+
+
+        elif self.mode == "bird_select":
+            pyxel.camera(0, 0)
+            
+            self.animation_timer += 1
+            if self.animation_timer > 15:
+                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                self.animation_timer = 0
+
+            # Red bird button
+            if self.actual_bird == self.blue_bird:
+                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.blue_orb >= 6:
+                            self.x, self.y = self.stele.tp_red()  # Red bird shrine position
+                            self.actual_bird = self.red_bird
+                            self.red_bird.goto(self.stele.tp_red())
+                            self.mode = "game"
+                            if not self.red_bird in self.unlock:
+                                self.unlock.append(self.red_bird)
+                        else:
+                            self.error_message = f"Besoin de {6 - self.blue_orb} orbes bleues en plus !"
+                            self.error_timer = 50
+                            
+                # Green bird button
+                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.red_orb >= 8:
+                            self.x, self.y = self.stele.tp_green  # Green bird shrine position
+                            self.actual_bird = self.green_bird
+                            self.green_bird.goto(self.stele.tp_green)
+                            self.mode = "game"
+                            if not self.green_bird in self.unlock:
+                                self.unlock.append(self.green_bird)
+                        else:
+                            self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
+                            self.error_timer = 50
+            
+            elif self.actual_bird == self.red_bird:
+
+                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        self.x, self.y = self.stele.tp_blue()  # Blue bird shrine position
+                        self.actual_bird = self.blue_bird
+                        self.blue_bird.goto(self.stele.tp_blue())
+                        self.mode = "game"
+                
+                # Green bird button
+                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.red_orb >= 8:
+                            self.x, self.y = self.stele.tp_green()
+                            self.actual_bird = self.green_bird
+                            self.green_bird.goto(self.stele.tp_green())
+                            self.mode = "game"
+                            if not self.green_bird in self.unlock:
+                                self.unlock.append(self.green_bird)                            
+                        else:
+                            self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
+                            self.error_timer = 50
+
+            elif self.actual_bird == self.green_bird:
+                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        self.x, self.y = self.stele.tp_red()
+                        self.actual_bird = self.red_bird
+                        self.red_bird.goto(self.stele.tp_red())
+                        self.mode = "game"
+
+                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        self.x, self.y = self.stele.tp_blue()
+                        self.actual_bird = self.blue_bird
+                        self.blue_bird.goto(self.stele.tp_blue())
+                        self.mode = "game"    
+    
+            if pyxel.btnp(pyxel.KEY_R):
+                self.mode = "game"
+
+
+        elif self.mode == "place_stele":
+            pyxel.camera(0, 0)
+            
+            self.animation_timer += 1
+            if self.animation_timer > 15:
+                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                self.animation_timer = 0
+
+            if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 100:
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    self.stele.place_blue(self.actual_bird.x, self.actual_bird.y)
+                    self.mode = "game"
+
+                        
+            if 40 <= pyxel.mouse_x <= 216 and 110 <= pyxel.mouse_y <= 160:
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    if self.blue_orb >= 10:
+                        self.stele.place_red(self.actual_bird.x, self.actual_bird.y)
+                        self.mode = "game"
+                        if not self.red_bird in self.unlock_stele:
+                            self.unlock_stele.append(self.red_bird)
+                    else:
+                        self.error_message = f"Besoin de {10 - self.blue_orb} orbes bleues en plus !"
+                        self.error_timer = 50
+            
+            if 40 <= pyxel.mouse_x <= 216 and 170 <= pyxel.mouse_y <= 220:
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    if self.red_orb >= 15:
+                        self.stele.place_green(self.actual_bird.x, self.actual_bird.y)
+                        self.mode = "game"
+                        if not self.green_bird in self.unlock_stele:
+                            self.unlock_stele.append(self.green_bird)
+                    else:
+                        self.error_message = f"Besoin de {15 - self.red_orb} orbes rouges en plus !"
+                        self.error_timer = 50
+
+            if pyxel.btnp(pyxel.KEY_R):
+                self.mode = "game"
+
+
+        elif self.mode == "mort":
+            if pyxel.btn(pyxel.KEY_R):
+                self.reset()
+
+        elif self.mode == "pause":
+            pyxel.camera(0, 0)
+            pyxel.cls(0)
+            pyxel.text(120, 90, "PAUSE", 7)
+            retour_button = {"x": 90, "y": 125, "w": 80, "h": 20}
+            self.draw_button(retour_button, "Retour au jeu", pyxel.COLOR_BLACK)
+            if self.is_button_clicked(retour_button):
+                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                self.mode = "game"
+            
+
+    def draw(self):
+        if self.mode == "menu":
+            pyxel.cls(0)
+            pyxel.bltm(0, 0, 0, 0, 16, 255 * 8, 255 * 8, None)
+
+           # Draw flying bird
+            bird1_x, bird1_y = self.bird1_frame * 8, 16
+            pyxel.blt(self.flying_bird_pos[0], self.flying_bird_pos[1], 0, bird1_x, bird1_y, 8, 8, 0)
+
+            # Draw walking birds
+            bird2_x, bird2_y = self.bird2_frame * 8, 24
+            pyxel.blt(self.walking_bird1_pos[0], self.walking_bird1_pos[1], 0, bird2_x, bird2_y, 8, 8, 0)
+            pyxel.blt(self.walking_bird2_pos[0], self.walking_bird2_pos[1], 0, bird2_x + 16, bird2_y, 8, 8, 0)
+
+            # Draw the game title using rectangles
+            title_x = (self.SCREEN_WIDTH) // 2
+            title_y = 60
+            
+            # Draw letters using rectangles
+            letter_width = 12
+            letter_spacing = 8
+            start_x = title_x + 70
+            
+            for i, letter in enumerate("BIRDIES"):
+                letter_x = start_x + i * (letter_width + letter_spacing)
+                self.draw_letter(letter, letter_x, title_y + 5, 0.5)
+                
+            # Boutons
+            self.draw_button(self.button_start, "Commencer")
+            self.draw_button(self.sauvegarde, "Charger une sauvegarde")
+            self.draw_button(self.button_quit, "Quitter")
+
+
+        elif self.mode == "save":
+            pyxel.cls(0)
+            pyxel.bltm(0, 0, 0, 0, 16, 255 * 8, 255 * 8, None)
+
+           # Draw flying bird
+            bird1_x, bird1_y = self.bird1_frame * 8, 16
+            pyxel.blt(self.flying_bird_pos[0], self.flying_bird_pos[1], 0, bird1_x, bird1_y, 8, 8, 0)
+
+            # Draw walking birds
+            bird2_x, bird2_y = self.bird2_frame * 8, 24
+            pyxel.blt(self.walking_bird1_pos[0], self.walking_bird1_pos[1], 0, bird2_x, bird2_y, 8, 8, 0)
+            pyxel.blt(self.walking_bird2_pos[0], self.walking_bird2_pos[1], 0, bird2_x + 16, bird2_y, 8, 8, 0)
+
+            self.save_class.show_save()
+
+
+        elif self.mode == "game":
+            pyxel.cls(0)  # Efface l'écran
+
+             # Save current camera position
+            camera_pos_x, camera_pos_y = self.x, self.y
+            
+            # Draw game elements affected by camera
+            pyxel.bltm(0, 0, 0, 0, 0, 255 * 8, 255 * 8, None)
+            self.stele.blue()
+            self.stele.red()
+            self.stele.green()
+            self.actual_bird.draw()
+
+            # Reset camera for UI elements
+            pyxel.camera(0, 0)
+
+            pyxel.blt(self.SCREEN_WIDTH - 10, 10, 0, 0, 8, 8, 8, 2)
+            pyxel.blt(self.SCREEN_WIDTH - 10, 20, 0, 8, 8, 8, 8, 2)
+            pyxel.blt(self.SCREEN_WIDTH - 10, 30, 0, 16, 8, 8, 8, 2)
+            pyxel.text(self.SCREEN_WIDTH - 15, 12, str(self.blue_orb), 7)
+            pyxel.text(self.SCREEN_WIDTH - 15, 22, str(self.red_orb), 7)
+            pyxel.text(self.SCREEN_WIDTH - 15, 32, str(self.green_orb), 7)
+
+            pyxel.rect(self.SCREEN_WIDTH - 52, 45, 50, 8, 1)
+            la_pipette_jaugee = int((self.actual_bird.teleport_jauge / self.actual_bird.teleport_jauge_max) * 48)
+            pyxel.rect(self.SCREEN_WIDTH - 52, 46, la_pipette_jaugee, 6, pyxel.COLOR_GREEN)
+            charge_width = int((self.actual_bird.tp_charge / self.actual_bird.tp_max_charge) * 48)
+            pyxel.rect(self.SCREEN_WIDTH - 52, 46, charge_width, 6, 9)
+            pyxel.rectb(self.SCREEN_WIDTH - 52, 45, 50, 8, 7)
+
+            if hasattr(self.end, 'show_message') and self.end.show_message:
+                pyxel.text(50, 20, "Les oiseaux et les stèles ne sont pas au bon endroit", 7)
+                self.end.message_timer -= 1
+                if self.end.message_timer <= 0:
+                    self.end.show_message = False
+
+
+            self.actual_bird.draw_particles()
+
+            # Restore camera position
+            pyxel.camera(camera_pos_x, camera_pos_y)
+
+
+        elif self.mode == "bird_select":
+            pyxel.camera(0, 0)
+
+            if (30 <= pyxel.mouse_x <= 218 and 
+                20 <= pyxel.mouse_y <= 228):
+                pyxel.mouse(True)
+            else:
+                pyxel.mouse(False)
+                
+            if self.error_timer > 0:
+                self.error_timer -= 1
+
+            # Background
+            pyxel.rect(30, 20, 196, 216, 5)
+            pyxel.rectb(30, 20, 196, 216, 7)
+            
+            # Title
+            title_x = 80
+            title_y = 55
+            for i, letter in enumerate("SELECT BIRD"):
+                self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
+
+            if self.actual_bird == self.blue_bird:
+                # Red Bird Section
+                pyxel.rect(40, 50, 176, 80, 8)
+                pyxel.text(50, 60, "Red Bird", 7)
+                pyxel.text(130, 60, "Necessaire : 6", 7) if not self.red_bird in self.unlock else None
+                pyxel.blt(190, 59, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock else None
+                pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
+                pyxel.line(40, 100, 216, 100, 7)
+                pyxel.text(50, 110, "Fast and agile", 7)
+                
+                # Green Bird Section
+                pyxel.rect(40, 150, 176, 80, 8)
+                pyxel.text(50, 160, "Green Bird", 7)
+                pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
+                pyxel.blt(190, 159, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
+                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
+                pyxel.line(40, 200, 216, 200, 7)
+                pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
+                pyxel.text(50, 220, "une duree determinee", 7)
+
+            elif self.actual_bird == self.red_bird:
+                # Red Bird Section
+                pyxel.rect(40, 50, 176, 80, 8)
+                pyxel.text(50, 60, "Blue Bird", 7)
+                pyxel.blt(50, 80, 0, self.bird2_frame * 8, 16, 8, 8, 2)  # Red bird sprite
+                pyxel.line(40, 100, 216, 100, 7)
+                pyxel.text(50, 110, "Un oiseau bleu ?", 7)
+                
+                # Green Bird Section
+                pyxel.rect(40, 150, 176, 80, 8)
+                pyxel.text(50, 160, "Green Bird", 7)
+                pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
+                pyxel.blt(190, 159, 0, 0, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
+                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
+                pyxel.line(40, 200, 216, 200, 7)
+                pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
+                pyxel.text(50, 220, "une duree determinee", 7)
+
+            elif self.actual_bird == self.green_bird:
+                # Red Bird Section
+                pyxel.rect(40, 50, 176, 80, 8)
+                pyxel.text(50, 60, "Red Bird", 7)
+                pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
+                pyxel.line(40, 100, 216, 100, 7)
+                pyxel.text(50, 110, "Fast and agile", 7)
+                
+                # Green Bird Section
+                pyxel.rect(40, 150, 176, 80, 8)
+                pyxel.text(50, 160, "Blue Bird", 7)
+                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 16, 8, 8, 2)  # Green bird sprite
+                pyxel.line(40, 200, 216, 200, 7)
+                pyxel.text(50, 210, "Un oiseau bleu ?", 7)
+
+            
+            # Error message
+            if self.error_timer > 0:
+                pyxel.rect(60, 110, 136, 20, 8)
+                pyxel.text(70, 115, self.error_message, 7)        
+
+
+        elif self.mode == "place_stele":
+            pyxel.camera(0, 0)
+
+            if (30 <= pyxel.mouse_x <= 218 and 
+                20 <= pyxel.mouse_y <= 228):
+                pyxel.mouse(True)
+            else:
+                pyxel.mouse(False)
+                
+            if self.error_timer > 0:
+                self.error_timer -= 1
+    
+            # Background
+            pyxel.rect(30, 20, 196, 216, 5)
+            pyxel.rectb(30, 20, 196, 216, 7)
+            
+            # Title
+            title_x = 80
+            title_y = 30
+            for i, letter in enumerate("PLACE STELE"):
+                self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
+
+            pyxel.rect(40, 50, 176, 50, 8)
+            pyxel.text(50, 60, "Blue Stele", 7)
+            pyxel.blt(50, 80, 0, 0, 72, 8, 8, 2)  # Red bird stele sprite
+            pyxel.blt(150, 80, 0, self.bird1_frame * 8, 16, -8, 8, 2)
+
+            pyxel.rect(40, 110, 176, 50, 8)
+            pyxel.text(50, 120, "Red Stele", 7)
+            pyxel.text(130, 120, "Necessaire : 10", 7) if not self.red_bird in self.unlock_stele else None
+            pyxel.blt(190, 119, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock_stele else None
+            pyxel.blt(150, 140, 0, self.bird2_frame * 8 + 16, 24, -8, 8, 2)  # Red bird sprite
+            pyxel.blt(50, 140, 0, 8, 64, 8, 8, 2)  # Red bird stele sprite
+
+            pyxel.rect(40, 170, 176, 50, 8)
+            pyxel.text(50, 180, "Green Stele", 7)
+            pyxel.text(130, 180, "Necessaire : 15", 7) if not self.green_bird in self.unlock_stele else None
+            pyxel.blt(190, 179, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock_stele else None
+            pyxel.blt(150, 200, 0, self.bird3_frame * 8, 24, -8, 8, 2)  # Green bird sprite
+            pyxel.blt(50, 200, 0, 0, 64, 8, 8, 2)  # Red bird stele sprite
+
+            # Error message
+            if self.error_timer > 0:
+                pyxel.rect(60, 110, 136, 20, 8)
+                pyxel.text(70, 115, self.error_message, 7)  
+
+
+        elif self.mode == "mort":
+            pyxel.cls(0)
+            pyxel.camera(0, 0)
+            start_x = (self.SCREEN_WIDTH // 2) + 55
+            letter_width = 12
+            letter_spacing = 8
+
+            for i, letter in enumerate("GAMEOVER"):
+                letter_x = start_x + i * (letter_width + letter_spacing)
+                self.draw_letter(letter, letter_x, self.SCREEN_WIDTH // 2 + 50, 0.5, pyxel.COLOR_BROWN)
+
+            pyxel.text(self.SCREEN_WIDTH // 2 - 65, self.SCREEN_HEIGHT // 2, "Pressez la touche r pour recommencer", pyxel.COLOR_PEACH)
+
+
+            if pyxel.btn(pyxel.KEY_R):
+                self.mode = "game"
+
+        elif self.mode == "pause" :
+            pyxel.camera(0, 0)
+            pyxel.cls(0)
+            pyxel.text(120, 90, "PAUSE", 7)
+
+            retour_button = {"x": 90, "y": 115, "w": 80, "h": 20}
+            self.draw_button(retour_button, "Retour au jeu", pyxel.COLOR_BLACK)
+            if self.is_button_clicked(retour_button):
+                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                self.mode = "game"
+
+            save_button = {"x": 60, "y": 145, "w": 140, "h": 20}
+            self.draw_button(save_button, "Sauvegarde et retourner au menu", pyxel.COLOR_BLACK)
+            if self.is_button_clicked(save_button):
+                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                self.save_class.sauvegarder()
+                                self.mode = "menu"
+
+            quitter_button = {"x": 90, "y": 175, "w": 80, "h": 20}
+            self.draw_button(quitter_button, "Quitter le jeu", pyxel.COLOR_BLACK)
+            if self.is_button_clicked(quitter_button):
+                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                pyxel.quit()
+
+    def draw_letter(self, letter, x, y, scale = 1, couleur : bool | int = True):
+        
+        def scaled_rect(x, y, w, h, couleur : bool | int = True):
+            if couleur == True:
+                for i in range(h):
+                    gradient_col = 7 + int((17 - 7) * i / h)
+                    pyxel.rect(x * scale, (y + i) * scale, w * scale, scale, gradient_col)
+            else:
+                for i in range(h):
+                    pyxel.rect(x * scale, (y + i) * scale, w * scale, scale, couleur)
+        if letter == 'B':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 6, 4, couleur)
+            scaled_rect(x + 4, y + 13, 6, 4, couleur)
+            scaled_rect(x + 4, y + 26, 6, 4, couleur)
+            scaled_rect(x + 10, y + 4, 4, 9, couleur)
+            scaled_rect(x + 10, y + 17, 4, 9, couleur)
+
+        elif letter == 'I':
+            scaled_rect(x + 4, y, 4, 30, couleur)
+
+        elif letter == 'R':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 13, 8, 4, couleur)
+            scaled_rect(x + 10, y + 4, 4, 9, couleur)
+            scaled_rect(x + 4, y + 17, 4, 4, couleur)
+            scaled_rect(x + 8, y + 21, 4, 4, couleur)
+            scaled_rect(x + 12, y + 24, 4, 5, couleur)
+
+        elif letter == 'D':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+            scaled_rect(x + 8, y + 4, 4, 22, couleur)
+
+        elif letter == 'E':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 13, 8, 4, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+
+        elif letter == 'S':
+            scaled_rect(x, y, 12, 4, couleur)
+            scaled_rect(x, y + 13, 12, 4, couleur)
+            scaled_rect(x, y + 26, 12, 4, couleur)
+            scaled_rect(x, y + 4, 4, 9, couleur)
+            scaled_rect(x + 8, y + 17, 4, 9, couleur)
+
+        elif letter == 'G':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+            scaled_rect(x + 8, y + 13, 4, 13, couleur)
+
+        elif letter == 'A':
+            scaled_rect(x, y + 4, 4, 26, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 13, 8, 4, couleur)
+            scaled_rect(x + 12, y + 4, 4, 26, couleur)
+
+        elif letter == 'M':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 4, 8, couleur)
+            scaled_rect(x + 8, y + 8, 4, 8, couleur)
+            scaled_rect(x + 12, y, 4, 8, couleur)
+            scaled_rect(x + 16, y, 4, 30, couleur)
+
+        elif letter == 'O':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+            scaled_rect(x + 12, y, 4, 30, couleur)
+
+        elif letter == 'V':
+            scaled_rect(x, y, 4, 20, couleur)
+            scaled_rect(x + 4, y + 20, 4, 6, couleur)
+            scaled_rect(x + 8, y + 26, 4, 4, couleur)
+            scaled_rect(x + 12, y + 20, 4, 6, couleur)
+            scaled_rect(x + 16, y, 4, 20, couleur)
+
+        elif letter == 'L':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+
+        elif letter == 'C':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 26, 8, 4, couleur)
+
+        elif letter == 'T':
+            scaled_rect(x + 4, y, 4, 30, couleur)
+            scaled_rect(x, y, 12, 4, couleur)
+
+        elif letter == 'N':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 4, 8, couleur)
+            scaled_rect(x + 8, y + 8, 4, 8, couleur)
+            scaled_rect(x + 12, y + 16, 4, 14, couleur)
+
+        elif letter == 'P':
+            scaled_rect(x, y, 4, 30, couleur)
+            scaled_rect(x + 4, y, 8, 4, couleur)
+            scaled_rect(x + 4, y + 13, 8, 4, couleur)
+            scaled_rect(x + 12, y + 4, 4, 9, couleur)
+
+
+    def draw_button(self, button, text, color : int = 5, border_color : int = 7, text_color : int = 7):
+        pyxel.rect(button["x"], button["y"], button["w"], button["h"], color)
+        pyxel.rectb(button["x"], button["y"], button["w"], button["h"], border_color)
+        text_x = button["x"] + (button["w"] - len(text) * 4) // 2
+        text_y = button["y"] + (button["h"] - 5) // 2
+        pyxel.text(text_x, text_y, text, text_color)
+
+        # Effet de survol
+        if self.is_button_clicked(button):
+            pyxel.rect(button["x"] + 1, button["y"] + 1, button["w"] - 2, button["h"] - 2, border_color)
+            pyxel.rectb(button["x"], button["y"], button["w"], button["h"], text_color)
+            pyxel.text(text_x, text_y, text, color)
+    
+    def is_button_clicked(self, button):
+        return (button["x"] <= pyxel.mouse_x <= button["x"] + button["w"] and
+                button["y"] <= pyxel.mouse_y <= button["y"] + button["h"])
+
+    def reset(self):
+        self.blue_bird.reset()
+        self.green_bird.reset()
+        self.red_bird.reset()
+        self.x = 0
+        self.y = 0
+        self.camera_x = 0
+        self.camera_y = 0
+        self.bird1_frame = 0
+        self.bird2_frame = 0
+        self.bird3_frame = 0
+        self.blue_orb = 0
+        self.red_orb = 0
+        self.green_orb = 0
+
+
+
+class Bird1:
+    def __init__(self, app, stele):
+        self.x = 10
+        self.y = 90
+        self.direction = "droite"
+        self.velocity_y = 0
+        self.bugs_bunny = 0
+        self.max_jumps = 3
+        self.gravity = 0.1
+        self.jump_strength = -2
+        self.frame = 0
+        self.pyxel_egal_caca = app
+        self.def_speed = 2
+        self.tp_charge = 0
+        self.tp_max_charge = 104
+        self.is_charging = False
+        self.particles = []
+        self.bird_particles = []
+        self.stele = stele
+        self.teleport_jauge = 0
+        self.teleport_jauge_max = 104
+        self.waiting = 0
+        
+    
+    def right(self):
+        new_x = self.x + self.def_speed  # Déplacer le joueur vers la droite
+        # Vérifier la collision avec la tuile à droite du joueur
+        if self.check_collision_right(new_x):
+            # Pas de collision, on peut avancer
+            self.x = min(new_x, self.pyxel_egal_caca.map_width - 17)
+            self.pyxel_egal_caca.update_camera()
+    
+
+    def left(self):
+        new_x = self.x - self.def_speed  # Déplacer le joueur vers la droite
+        # Vérifier la collision avec la tuile à droite du joueur
+        if self.check_collision_left(new_x):
+            # Pas de collision, on peut avancer
+            self.x = max(1, self.x - self.def_speed)
+            self.pyxel_egal_caca.update_camera()
+
+
+    def jump(self):
+        if self.bugs_bunny < self.max_jumps:
+            self.velocity_y = self.jump_strength
+            self.bugs_bunny += 1
+
+
+    def update(self):
+        # Apply gravity
+        self.velocity_y += self.gravity
+        new_y = self.y + self.velocity_y
+
+
+        if self.check_collision_below(new_y):
+            self.y = (new_y // 8) * 8
+            self.velocity_y = 0
+            self.bugs_bunny = 0
+        else:
+            if not self.check_collision_above(new_y):
+                self.y = new_y
+
+
+        # Limit falling speed
+        if self.velocity_y > 4:
+            self.velocity_y = 4
+
+        if pyxel.btn(pyxel.KEY_T):
+            if self.teleport_jauge == self.teleport_jauge_max:
+                self.is_charging = True
+                self.tp_charge = min(self.tp_charge + 2, self.tp_max_charge)
+                # Gauge particles
+                if random.random() < 0.3:
+                    charge_x = self.pyxel_egal_caca.SCREEN_WIDTH - 59 + int((self.tp_charge / self.tp_max_charge) * 48)
+                    self.particles.append(Particle(charge_x, 50, "gauge"))
+                # Bird particles while charging
+                if random.random() < 0.4:
+                    self.particles.append(Particle(
+                        self.x + random.randint(0, 8),
+                        self.y + random.randint(0, 8),
+                        "bird"
+                    ))
+            
+            else:
+                if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                    self.goto(self.stele.tp_red())
+                self.is_charging = False
+                self.tp_charge = max(0, self.tp_charge - 1)
+                if self.waiting >= 20:
+                    self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                    self.waiting = 0
+                else:
+                    self.waiting += 1
+
+        else:
+            if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.goto(self.stele.tp_blue())
+            self.is_charging = False
+            self.tp_charge = max(0, self.tp_charge - 1)
+            if self.waiting >= 20:
+                self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                self.waiting = 0
+            else:
+                self.waiting += 1
+                
+        # Update particles
+        for particle in self.particles[:]:
+            if particle.type == "bird":
+                particle.vy += 0.1  # Add gravity to bird particles
+            particle.x += particle.vx
+            particle.y += particle.vy
+            particle.life -= 1
+            if particle.life <= 0:
+                self.particles.remove(particle)
+
+        self.check_items_collision()
+
+
+    def draw_particles(self):
+        for particle in self.particles:
+            if particle.type == "gauge":
+                # Draw gauge particles relative to screen
+                screen_x = particle.x
+                screen_y = particle.y
+            else:
+                # Draw bird particles relative to world
+                screen_x = particle.x - self.pyxel_egal_caca.camera_x
+                screen_y = particle.y - self.pyxel_egal_caca.camera_y
+            pyxel.pset(screen_x, screen_y, particle.color)
+
+
+    def draw(self):
+        if self.direction == "droite":
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame, 16, 8, 8, 2)
+        else:
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame, 16, -8, 8, 2)
+
+
+    def check_collision_below(self, new_y):
+        """
+        Vérifie s'il y a une collision sous le joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        # On vérifie à deux points : sous le coin gauche et sous le coin droit du joueur
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 6 + self.def_speed) // 8)  # Coin gauche
+        right_tile = pyxel.tilemaps[0].pget((self.x + 8) // 8, (new_y + 6 + self.def_speed) // 8)  # Coin droit
+
+        # Si l'une des tuiles en dessous est un obstacle (collide), il y a une collision
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS or left_tile in self.pyxel_egal_caca.special_colliders or right_tile in self.pyxel_egal_caca.special_colliders
+    
+
+    def check_collision_right(self, new_x):
+        """
+        Vérifie s'il y a une collision à droite du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, self.y // 8)  # Coin supérieur droit
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, (self.y + 7) // 8)  # Coin inférieur droit
+
+        # Si l'une des tuiles à droite est un obstacle (collide), il y a une collision
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+
+
+    def check_collision_left(self, new_x):
+        """
+        Vérifie s'il y a une collision à gauche du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, self.y // 8)  # Coin supérieur gauche
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, (self.y + 7) // 8)  # Coin inférieur gauche
+        # Si l'une des tuiles à gauche est un obstacle (collide), il y a une collision
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+    
+    
+    def check_collision_above(self, new_y):
+        """
+        Vérifie s'il y a une collision au-dessus du joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        # On vérifie à deux points : au-dessus du coin gauche et au-dessus du coin droit du joueur
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 1 - self.def_speed) // 8)  # Coin gauche
+        right_tile = pyxel.tilemaps[0].pget((self.x + 7) // 8, (new_y + 1 - self.def_speed) // 8)  # Coin droit
+
+        # Si l'une des tuiles au-dessus est un obstacle (collide), il y a une collision
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS
+    
+    def check_items_collision(self):
+            tile_x = self.x // 8
+            tile_y = self.y // 8
+
+            tile = pyxel.tilemaps[0].pget(tile_x, tile_y)
+
+            if tile == (0, 1):
+                pyxel.tilemaps[0].pset(tile_x, tile_y, (0, 0))
+                self.pyxel_egal_caca.blue_orb += 1
+
+    def reset(self):
+        self.x = 10
+        self.y = 50
+        self.velocity_y = 0
+        self.bugs_bunny = 0
+        self.max_jumps = 3
+        self.frame = 0
+
+    def get_pos(self):
+        return (self.x, self.y)
+
+    def goto(self, tuple_x_y):
+        self.x = tuple_x_y[0]
+        self.y = tuple_x_y[1]
+        self.teleport_jauge = 0
+        self.pyxel_egal_caca.x = tuple_x_y[0]
+        self.pyxel_egal_caca.y = tuple_x_y[1]
+        self.pyxel_egal_caca.update_camera()
+
+    def set_stele(self):
+        self.stele.place_blue(self.x, self. y)
+
+    def to_dict(self):
+        return "Bird1"
+    
+
+class Bird2:
+    def __init__(self, app, stele):
+        self.x = 0
+        self.y = 0
+        self.direction = "droite"
+        self.velocity_y = 0
+        self.bugs_bunny = 0  # Track number of jumps
+        self.max_jumps = 3  # Maximum allowed jumps
+        self.gravity = 0.1
+        self.jump_strength = -2
+        self.frame = 0
+        self.pyxel_egal_caca = app
+        self.def_speed = 2
+        self.tp_charge = 0
+        self.tp_max_charge = 100
+        self.is_charging = False
+        self.particles = []
+        self.bird_particles = []
+        self.stele = stele
+        self.teleport_jauge = 0
+        self.teleport_jauge_max = 100
+        self.waiting = 0
+
+    def right(self):
+        new_x = self.x + self.def_speed  # Déplacer le joueur vers la droite
+        # Vérifier la collision avec la tuile à droite du joueur
+        if self.check_collision_right(new_x):
+            # Pas de collision, on peut avancer
+            self.x = min(new_x, self.pyxel_egal_caca.map_width - 17)
+            self.pyxel_egal_caca.update_camera()
+    
+
+    def left(self):
+        new_x = self.x - self.def_speed  # Déplacer le joueur vers la droite
+        # Vérifier la collision avec la tuile à droite du joueur
+        if self.check_collision_left(new_x):
+            # Pas de collision, on peut avancer
+            self.x = max(1, self.x - self.def_speed)
+            self.pyxel_egal_caca.update_camera()
+
+
+    def jump(self):
+        if self.bugs_bunny < self.max_jumps:
+            self.velocity_y = self.jump_strength
+            self.bugs_bunny += 1
+
+    def draw(self):
+        if self.direction == "droite":
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame + 16, 24, 8, 8, 2)
+        else:
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame + 16, 24, -8, 8, 2)
+
+    def update(self):
+        # Apply gravity
+        self.velocity_y += self.gravity
+        new_y = self.y + self.velocity_y
+
+
+        if self.check_collision_below(new_y):
+            self.y = (new_y // 8) * 8
+            self.velocity_y = 0
+            self.bugs_bunny = 0
+        else:
+            if not self.check_collision_above(new_y):
+                self.y = new_y
+
+        # Limit falling speed
+        if self.velocity_y > 4:
+            self.velocity_y = 4
+
+        if pyxel.btn(pyxel.KEY_T):
+            if self.teleport_jauge == self.teleport_jauge_max:
+                self.is_charging = True
+                self.tp_charge = min(self.tp_charge + 2, self.tp_max_charge)
+                # Gauge particles
+                if random.random() < 0.3:
+                    charge_x = self.pyxel_egal_caca.SCREEN_WIDTH - 59 + int((self.tp_charge / self.tp_max_charge) * 48)
+                    self.particles.append(Particle(charge_x, 50, "gauge"))
+                # Bird particles while charging
+                if random.random() < 0.4:
+                    self.particles.append(Particle(
+                        self.x + random.randint(0, 8),
+                        self.y + random.randint(0, 8),
+                        "bird"
+                    ))
+            
+            else:
+                if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                    self.goto(self.stele.tp_red())
+                self.is_charging = False
+                self.tp_charge = max(0, self.tp_charge - 1)
+                if self.waiting >= 20:
+                    self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                    self.waiting = 0
+                else:
+                    self.waiting += 1
+
+        else:
+            if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.goto(self.stele.tp_red())
+            self.is_charging = False
+            self.tp_charge = max(0, self.tp_charge - 1)
+            if self.waiting >= 20:
+                self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                self.waiting = 0
+            else:
+                self.waiting += 1
+                
+        # Update particles
+        for particle in self.particles[:]:
+            if particle.type == "bird":
+                particle.vy += 0.1  # Add gravity to bird particles
+            particle.x += particle.vx
+            particle.y += particle.vy
+            particle.life -= 1
+            if particle.life <= 0:
+                self.particles.remove(particle)
+
+        self.check_items_collision()
+
+    def check_collision_below(self, new_y):
+        """
+        Vérifie s'il y a une collision sous le joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        # On vérifie à deux points : sous le coin gauche et sous le coin droit du joueur
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 6 + self.def_speed) // 8)  # Coin gauche
+        right_tile = pyxel.tilemaps[0].pget((self.x + 8) // 8, (new_y + 6 + self.def_speed) // 8)  # Coin droit
+
+        # Si l'une des tuiles en dessous est un obstacle (collide), il y a une collision
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS or left_tile in self.pyxel_egal_caca.special_colliders or right_tile in self.pyxel_egal_caca.special_colliders
+    
+
+    def check_collision_right(self, new_x):
+        """
+        Vérifie s'il y a une collision à droite du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, self.y // 8)  # Coin supérieur droit
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, (self.y + 7) // 8)  # Coin inférieur droit
+
+        # Si l'une des tuiles à droite est un obstacle (collide), il y a une collision
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+
+
+    def check_collision_left(self, new_x):
+        """
+        Vérifie s'il y a une collision à gauche du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, self.y // 8)  # Coin supérieur gauche
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, (self.y + 7) // 8)  # Coin inférieur gauche
+        # Si l'une des tuiles à gauche est un obstacle (collide), il y a une collision
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+    
+    
+    def check_collision_above(self, new_y):
+        """
+        Vérifie s'il y a une collision au-dessus du joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        # On vérifie à deux points : au-dessus du coin gauche et au-dessus du coin droit du joueur
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 1 - self.def_speed) // 8)  # Coin gauche
+        right_tile = pyxel.tilemaps[0].pget((self.x + 7) // 8, (new_y + 1 - self.def_speed) // 8)  # Coin droit
+
+        # Si l'une des tuiles au-dessus est un obstacle (collide), il y a une collision
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS
+    
+    def check_items_collision(self):
+        tile_x = self.x // 8
+        tile_y = self.y // 8
+
+        tile = pyxel.tilemaps[0].pget(tile_x, tile_y)
+
+        if tile == (1, 1):
+            pyxel.tilemaps[0].pset(tile_x, tile_y, (0, 0))
+            self.pyxel_egal_caca.red_orb += 1
+
+    def set_stele(self):
+        self.stele.place_red(self.x, self.y)
+
+    def draw_particles(self):
+        for particle in self.particles:
+            if particle.type == "gauge":
+                # Draw gauge particles relative to screen
+                screen_x = particle.x
+                screen_y = particle.y
+            else:
+                # Draw bird particles relative to world
+                screen_x = particle.x - self.pyxel_egal_caca.camera_x
+                screen_y = particle.y - self.pyxel_egal_caca.camera_y
+            pyxel.pset(screen_x, screen_y, particle.color)
+
+    def reset(self):
+        self.x = 50
+        self.y = 50
+
+    def get_pos(self):
+        return (self.x, self.y)
+    
+    def goto(self, tuple_x_y):
+        self.x = tuple_x_y[0]
+        self.y = tuple_x_y[1]
+        self.teleport_jauge = 0
+        self.pyxel_egal_caca.x = tuple_x_y[0]
+        self.pyxel_egal_caca.y = tuple_x_y[1]
+        self.pyxel_egal_caca.update_camera()
+
+    def to_dict(self):
+        return "Bird2"
+
+
+class Bird3:
+    def __init__(self, app, stele):
+        self.x = 50
+        self.y = 50
+        self.pyxel_egal_caca = app
+    
+    def reset(self):
+        self.x = 50
+        self.y = 50
+
+    def get_pos(self):
+        return (self.x, self.y)
+
+    def goto(self, tuple_x_y):
+        self.x = tuple_x_y[0]
+        self.y = tuple_x_y[1]
+        self.teleport_jauge = 0
+        self.pyxel_egal_caca.x = tuple_x_y[0]
+        self.pyxel_egal_caca.y = tuple_x_y[1]
+        self.pyxel_egal_caca.update_camera()
+
+    def check_items_collision(self):
+        tile_x = self.x // 8
+        tile_y = self.y // 8
+
+        tile = pyxel.tilemaps[0].pget(tile_x, tile_y)
+
+        if tile == (1, 2):
+            pyxel.tilemaps[0].pset(tile_x, tile_y, (0, 0))
+            self.pyxel_egal_caca.green_orb += 1
+
+    def to_dict(self):
+        return "Bird3"
+
+
+class Stele:
+    """
+    Classe pour la gestion des stèles des oiseaux
+    """
+    def __init__(self):
+        self.blue_x = 3 * 8
+        self.blue_y = 14 * 8
+        self.red_x = 22 * 8
+        self.red_y = 32
+        self.green_x = 114 * 8
+        self.green_y = 8
+    
+    def blue(self):
+        pyxel.blt(self.blue_x, self.blue_y, 0, 0, 72, 8, 8, pyxel.COLOR_PURPLE)
+
+    def red(self):
+        pyxel.blt(self.red_x, self.red_y, 0, 8, 64, 8, 8, pyxel.COLOR_PURPLE)
+
+    def green(self):
+        pyxel.blt(self.green_x, self.green_y, 0, 0, 64, 8, 8, pyxel.COLOR_PURPLE)
+
+    def place_blue(self, x, y):
+        self.blue_x = x
+        self.blue_y = y
+
+    def place_green(self, x, y):
+        self.green_x = x
+        self.green_y = y
+    
+    def place_red(self, x, y):
+        self.red_x = x
+        self.red_y = y
+
+    def tp_blue(self):
+        return self.blue_x, self.blue_y
+    
+    def tp_red(self):
+        return self.red_x, self.red_y
+
+    def tp_green(self):
+        return self.green_x, self.green_y
+
+    def reset(self):
+        self.blue_x = 3 * 8
+        self.blue_y = 14 * 8
+        self.red_x = 22 * 8
+        self.red_y = 32
+        self.green_x = 114 * 8
+        self.green_y = 8
+
+    def get_stele(self):
+        return (self.blue_x, self.blue_y), (self.red_x, self.red_y), (self.green_x, self.green_y)
+
+
+class Tombe:
+    def __init__(self, app) -> None:
+        self.x = 32
+        self.y = 47 * 8
+        self.width = 8
+        self.height = 8
+        self.pyxel_egal_caca = app
+        self.phrases_hommage = [
+                                "Je ne sais pas combien de temps je vais devoir rester ici pour veiller sur cette porte.",
+                                "Cette tombe est tout ce qui me reste de mes frères et soeurs...",
+                                "Elle risque de blesser mes frères et sœurs si je ne la garde pas.",
+                                "Se souvenir, c’est donner un sens à ce que nous avons vécu, merci pour cela.",
+                                "Je veille sur ce lieu pour que d'autres n'oublient pas notre histoire.",
+                                "Il est parfois difficile de rester ici seul, mais ton hommage me réconforte.",
+                                "Chaque hommage me rappelle que je ne suis pas totalement oublié. Mais tout hommage m'éloigne d'eux...",
+                                "Rester ici, entre le passé et l’oubli, est moins pesant grâce à toi... Mais je me demande ce qu'ils font ?...",
+                                "Je suis là pour protéger, même si cela signifie rester figé ici pour toujours. (aider moi à partir...)",
+                                "Ton hommage redonne de la vie à notre mémoire, merci.",
+                                "Je suis le gardien de ce passage, pour que d’autres puissent avancer en paix. (mais je n'arrive plus à tenir)",
+                                "Mon existence ici a plus de sens quand on vient me voir. (mais a-t-elle déjà eu un sens ? pourquoi je suis comme ça ? je ne suis pas bien...)",
+                                "Merci de respecter ce lieu sacré, tout le monde ne le fait pas.",
+                                "Restez prudents, je veille ici pour que rien de mal ne survienne. (je peux pas dire que je vais lâcher)",
+                                "Ce n'est pas facile de protéger cet endroit, mais ta présence aide. (sans penser à cette autre présence)",
+                                "Je veille pour que la tranquillité règne ici, merci de me le rappeler.",
+                                "Il n’y a rien de plus précieux que le souvenir que vous m'offrez. (je commence à tout oublier, est-ce donc ça l'au-delà ?...)",
+                                "Parfois, la solitude est lourde ici, mais ton hommage adoucit cela. (je souhaite les rejoindre)"
+                                ]
+        self.frame = 0
+        
+
+    def check_collision_with_stele(self, bird):
+        """
+        Vérifie la collision avec la tombe et empêche l'oiseau de passer au travers.
+        """
+        # Vérifie la collision en fonction de la direction de l'oiseau
+        if bird.x < self.x + self.width and bird.x + 8 > self.x and \
+           bird.y < self.y + self.height and bird.y + 8 > self.y: # le \ sert à diviser la condition sinon le cobra comprendra que c'est deux instructions distrinctes. il ne se méfie pas assez
+            if bird.direction == "droite":
+                bird.x = self.x - 8
+            elif bird.direction == "gauche":
+                bird.x = self.x + self.width
+
+    def check_homage(self, bird):
+        """
+        Vérifie si l'utilisateur appuie sur le 'h' et que l'oiseau est à proximité de la tombe.
+        """
+        distance_x = abs(bird.x - self.x)
+        distance_y = abs(bird.y - self.y)
+
+        # Si l'oiseau est dans une zone de 45 pixels autour de la tombe et que 'h' est appuyé
+        if distance_x <= 45 and distance_y <= 45 and pyxel.btnp(pyxel.KEY_H):
+            if not bird.to_dict() in self.pyxel_egal_caca.hommage: 
+                print("Merci de m'avoir rendu hommage, je vais bientôt pouvoir partir en paix")
+                self.pyxel_egal_caca.hommage.append(bird.to_dict())
+            else :
+                print("Tu m'as déjà rendu hommage, merci quand même. " + random.choice(self.phrases_hommage))
+
+    def check_bird(self):
+        # Test de blit sans conditions pour vérifier l'affichage
+        pyxel.rect(10, 90, 16, 16, 0)
+
+ 
+class End:
+    def __init__(self, app) -> None:
+        self.blue = 13
+        self.red = 21
+        self.green = 29
+        self.pyxel_egal_caca = app
+        self.bx = 247 * 8
+        self.by = 13 * 8
+        self.rx = 242 * 8
+        self.ry = 56    
+        self.gx = 252 * 8
+        self.gy = 72
+        self.message_timer = 100  # Will show for 60 frames
+        self.show_message = False
+
+
+    def detect(self, blue, red, green, blue_bird, red_bird, green_bird, stele):
+        """
+        Fonction qui détecte si l'utilisateur a bien récuéperer toutes les orbes, mis les oiseaux et les steles au bon endroit
+        -------------------------
+        blue : nombre d'orbes bleues
+        red : nombre d'orbes rouges
+        green : nombre d'orbes vertes
+        blue_x : position x de l'oiseau bleu
+        blue_y : position y de l'oiseau bleu
+        red_x : position x de l'oiseau rouge
+        red_y : position y de l'oiseau rouge
+        green_x : position x de l'oiseau vert
+        green_y : position y de l'oiseau vert
+        stele_blue_x : position x de la stele bleue
+        stele_blue_y : position y de la stele bleue
+        stele_red_x : position x de la stele rouge
+        stele_red_y : position y de la stele rouge
+        stele_green_x : position x de la stele verte
+        stele_green_y : position y de la stele verte
+        """
+        if blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.pyxel_egal_caca.mode = "win"
+        elif blue_bird.get_pos()[0] == self.bx and blue_bird.get_pos()[1] == self.by:
+            self.message_timer = 100  # Will show for 60 frames
+            self.show_message = True
+
+
+
+if __name__ == "__main__":
+    App()
