@@ -711,9 +711,12 @@ class App:
             pyxel.rect(self.SCREEN_WIDTH - 52, 46, charge_width, 6, 9)
             pyxel.rectb(self.SCREEN_WIDTH - 52, 45, 50, 8, 7)
 
-            if hasattr(self.end, 'show_message') and self.end.show_message:
+            if self.end.show_message:
                 pyxel.rect(self.end.pos_rect[0], self.end.pos_rect[1], self.end.taille_rect[0], self.end.taille_rect[1], pyxel.COLOR_BLACK)
                 pyxel.text(self.end.pos_rect[0] + 10, self.end.pos_rect[1] + 10, self.end.message, 7)
+                if hasattr(self.end, "message_2"):
+                    pyxel.rect(self.end.pos_rect[0], self.end.pos_rect[1] + self.end.taille_rect[1], self.end.taille_rect[0], self.end.taille_rect[1] - 10, pyxel.COLOR_BLACK)
+                    pyxel.text(self.SCREEN_WIDTH - self.end.taille_rect[0] + self.end.pos_rect[0] + 10, self.end.pos_rect[1] + self.end.taille_rect[1], self.end.message_2, 7)
                 self.end.message_timer -= 1
                 if self.end.message_timer <= 0:
                     self.end.show_message = False
@@ -803,7 +806,7 @@ class App:
             
             # Error message
             if self.error_timer > 0:
-                pyxel.rect(60, 110, 136, 20, 8)
+                pyxel.rect(65, 110, 145, 20, pyxel.COLOR_PURPLE)
                 pyxel.text(70, 115, self.error_message, 7)        
 
 
@@ -825,7 +828,7 @@ class App:
             
             # Title
             title_x = 80
-            title_y = 30
+            title_y = 50
             for i, letter in enumerate("PLACE STELE"):
                 self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
 
@@ -850,7 +853,7 @@ class App:
 
             # Error message
             if self.error_timer > 0:
-                pyxel.rect(60, 110, 136, 20, 8)
+                pyxel.rect(65, 110, 150, 20, pyxel.COLOR_PURPLE)
                 pyxel.text(70, 115, self.error_message, 7)  
 
 
@@ -1819,12 +1822,12 @@ class End:
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
             self.message_timer = 100 
-            self.pos_rect = (50, 10)
-            self.taille_rect = (self.pyxel_egal_caca.SCREEN_WIDTH - 50)
-            self.message = f"Tu as oublie une orbe bleue et une orbe rouge ! Mefies-toi !!" if self.blue - blue == 1 and self.red - red == 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues et une orbe rouge ! Mefies-toi !!" if self.blue - blue != 1 and self.red - red == 1 else \
-                f"Tu as oublie une orbe bleue et {self.red-red} orbes rouges ! Mefies-toi !!" if self.blue - blue == 1 and self.red - red != 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues et {self.red-red} orbes rouges ! Mefies-toi !!"
+            self.pos_rect = (25, 10)
+            self.taille_rect = (210,30)
+            self.message = f"Tu as oublie une orbe bleue et une orbe rouge !" if self.blue - blue == 1 and self.red - red == 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues et une orbe rouge !" if self.blue - blue != 1 and self.red - red == 1 else \
+                f"Tu as oublie une orbe bleue et {self.red-red} orbes rouges !" if self.blue - blue == 1 and self.red - red != 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues et {self.red-red} orbes rouges !"
             self.show_message = True
 
         elif blue != self.blue and red == self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
@@ -1834,12 +1837,12 @@ class End:
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
             self.message_timer = 100 
-            self.pos_rect = (50, 10)
-            self.taille_rect = (self.pyxel_egal_caca.SCREEN_WIDTH - 50)
-            self.message = f"Tu as oublie une orbe bleue et une orbe verte ! Mefies-toi !!" if self.blue - blue == 1 and self.green - green == 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues et une orbe verte ! Mefies-toi !!" if self.blue - blue != 1 and self.green - green == 1 else \
-                f"Tu as oublie une orbe bleue et {self.green-green} orbes vertes ! Mefies-toi !!" if self.blue - blue == 1 and self.green - green != 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues et {self.green-green} orbes vertes ! Mefies-toi !!"
+            self.pos_rect = (25, 10)
+            self.taille_rect = (210,30)
+            self.message = f"Tu as oublie une orbe bleue et une orbe verte !" if self.blue - blue == 1 and self.green - green == 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues et une orbe verte !" if self.blue - blue != 1 and self.green - green == 1 else \
+                f"Tu as oublie une orbe bleue et {self.green-green} orbes vertes !" if self.blue - blue == 1 and self.green - green != 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues et {self.green-green} orbes vertes !"
             self.show_message = True
 
         elif blue == self.blue and red != self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
@@ -1849,12 +1852,12 @@ class End:
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
             self.message_timer = 100 
-            self.pos_rect = (50, 10)
-            self.taille_rect = (self.pyxel_egal_caca.SCREEN_WIDTH - 50)
-            self.message = f"Tu as oublie une orbe rouge et une orbe verte ! Mefies-toi !!" if self.red - red == 1 and self.green - green == 1 else \
-                f"Tu as oublie {self.red-red} orbes rouges et une orbe verte ! Mefies-toi !!" if self.red - red != 1 and self.green - green == 1 else \
-                f"Tu as oublie une orbe rouge et {self.green-green} orbes vertes ! Mefies-toi !!" if self.red - red == 1 and self.green - green != 1 else \
-                f"Tu as oublie {self.red-red} orbes rouges et {self.green-green} orbes vertes ! Mefies-toi !!"
+            self.pos_rect = (25, 10)
+            self.taille_rect = (210,30)
+            self.message = f"Tu as oublie une orbe rouge et une orbe verte !" if self.red - red == 1 and self.green - green == 1 else \
+                f"Tu as oublie {self.red-red} orbes rouges et une orbe verte !" if self.red - red != 1 and self.green - green == 1 else \
+                f"Tu as oublie une orbe rouge et {self.green-green} orbes vertes !" if self.red - red == 1 and self.green - green != 1 else \
+                f"Tu as oublie {self.red-red} orbes rouges et {self.green-green} orbes vertes !"
             self.show_message = True
         
         elif blue != self.blue and red != self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
@@ -1864,14 +1867,800 @@ class End:
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
             self.message_timer = 100 
-            self.pos_rect = (50, 10)
-            self.taille_rect = (self.pyxel_egal_caca.SCREEN_WIDTH - 50)
-            self.message = f"Tu as oublie une orbe bleue, une orbe rouge et une orbe verte ! Mefies-toi !!" if self.blue - blue == 1 and self.red - red == 1 and self.green - green == 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues, une orbe rouge et une orbe verte ! Mefies-toi !!" if self.blue - blue != 1 and self.red - red == 1 and self.green - green == 1 else \
-                f"Tu as oublie une orbe bleue, {self.red-red} orbes rouges et une orbe verte ! Mefies-toi !!" if self.blue - blue == 1 and self.red - red != 1 and self.green - green == 1 else \
-                f"Tu as oublie une orbe bleue, une orbe rouge et {self.green-green} orbes vertes ! Mefies-toi !!" if self.blue - blue == 1 and self.red - red == 1 and self.green - green != 1 else \
-                f"Tu as oublie {self.blue-blue} orbes bleues, {self.red-red} orbes rouges et {self.green-green} orbes vertes ! Mefies-toi !!"
+            self.pos_rect = (30, 10)
+            self.taille_rect = (200,30)
+            self.message = f"Tu as oublie une orbe bleue, une orbe rouge" if self.blue - blue == 1 and self.red - red == 1 and self.green - green == 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues, une orbe rouge" if self.blue - blue != 1 and self.red - red == 1 and self.green - green == 1 else \
+                f"Tu as oublie une orbe bleue, {self.red-red} orbes rouges" if self.blue - blue == 1 and self.red - red != 1 and self.green - green == 1 else \
+                f"Tu as oublie une orbe bleue, une orbe rouge" if self.blue - blue == 1 and self.red - red == 1 and self.green - green != 1 else \
+                f"Tu as oublie {self.blue-blue} orbes bleues, {self.red-red} orbes rouges"
+            self.message_2 = f"et une orbe verte !" if self.blue - blue == 1 and self.red - red == 1 and self.green - green == 1 else \
+                f"et une orbe verte !" if self.blue - blue != 1 and self.red - red == 1 and self.green - green == 1 else \
+                f"et une orbe verte !" if self.blue - blue == 1 and self.red - red != 1 and self.green - green == 1 else \
+                f"{self.green-green} orbes vertes !" if self.blue - blue == 1 and self.red - red == 1 and self.green - green != 1 else \
+                f"et {self.green-green} orbes vertes !"
             self.show_message = True
+        
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"L'oiseau bleu est mal placee ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"L'oiseau rouge est mal placee ! Mefies-toi !!"
+            self.show_message = True
+        
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"L'oiseau vert est mal placee ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"L'oiseau bleu et rouge sont mal places ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"L'oiseau rouge et vert sont mal places ! Mefies-toi !!"
+            self.show_message = True
+        
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"L'oiseau bleu et vert sont mal places ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1]!= self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (30, 10)
+            self.taille_rect = (205, 30)
+            self.message = f"L'oiseau bleu, rouge et vert sont mal places !"
+            self.show_message = True
+
+        
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"La stele bleue est mal placee ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"La stele rouge est mal placee ! Mefies-toi !!"
+            self.show_message = True
+        
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1]!= self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (40, 10)
+            self.taille_rect = (190, 30)
+            self.message = f"La stele verte est mal placee ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"La stele bleue et rouge sont mal placees ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"La stele rouge et verte sont mal placees ! Mefies-toi !!"
+            self.show_message = True
+        
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (5, 10)
+            self.taille_rect = (232, 30)
+            self.message = f"La stele bleue et verte sont mal placees ! Mefies-toi !!"
+            self.show_message = True
+
+        elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] == self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
+        and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] == self.gy \
+        or \
+        blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
+        and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
+        and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
+        and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
+        and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy:
+            self.message_timer = 100 
+            self.pos_rect = (30, 10)
+            self.taille_rect = (205, 30)
+            self.message = f"La stele bleue, rouge et verte sont mal placees !"
+            self.show_message = True
+
 
 
 if __name__ == "__main__":
