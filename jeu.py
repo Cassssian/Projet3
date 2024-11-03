@@ -781,17 +781,26 @@ class App:
             if self.tombe.show_message:
                 pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
                 pyxel.text(self.tombe.pos_rect[0] + 10, self.tombe.pos_rect[1] + 10, self.tombe.message, 7)
-                if hasattr(self.tombe, "message_2") and self.actual_bird in self.hommage: 
-                    pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1] - 10, pyxel.COLOR_BLACK)
-                    pyxel.text(self.SCREEN_WIDTH - self.tombe.taille_rect[0] + self.tombe.pos_rect[0] + 10, self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.message_2, 7)
-                elif hasattr(self.tombe, "message_2") and not self.actual_bird in self.hommage:
+                
+                if hasattr(self.tombe, "message_2") and not self.actual_bird.to_dict() in self.hommage:
                     pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1] - 10, pyxel.COLOR_BLACK)
                     pyxel.text(self.SCREEN_WIDTH - self.tombe.taille_rect[0] + 10, self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.message_2, 7)
+
+                if hasattr(self.tombe, "message_2") and self.actual_bird.to_dict() in self.hommage: 
+                    pyxel.rect(0, self.tombe.pos_rect[1] + self.tombe.taille_rect[1], 256, self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
+                    pyxel.text(10, self.tombe.pos_rect[1] + self.tombe.taille_rect[1] + 10, self.tombe.message_2, 7)
+
+                if hasattr(self.tombe,"message_3"):
+                    pyxel.rect(self.tombe.pos_rect3[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 2, self.tombe.pos_rect3[1], self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
+                    pyxel.text(self.tombe.pos_rect3[0] + 10 , self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 2 + 10, self.tombe.message_3, 7)
+                
                 self.tombe.message_timer -= 1
                 if self.tombe.message_timer <= 0:
                     self.tombe.show_message = False
-
+                    if not self.actual_bird.to_dict() in self.hommage:
+                        self.hommage.append(self.actual_bird.to_dict())
             self.actual_bird.draw_particles()
+            self.tombe.draw_particles()
 
             # Restore camera position
             pyxel.camera(camera_pos_x, camera_pos_y)
@@ -2072,22 +2081,22 @@ class Tombe:
         self.pyxel_egal_caca = app
         self.phrases_hommage = [
                                 "Je ne sais pas combien de temps je vais devoir rester ici pour veiller sur cette porte.",
-                                "Cette tombe est tout ce qui me reste de mes frères et soeurs...",
-                                "Elle risque de blesser mes frères et sœurs si je ne la garde pas.",
-                                "Se souvenir, c’est donner un sens à ce que nous avons vécu, merci pour cela.",
+                                "Cette tombe est tout ce qui me reste de mes freres et soeurs...",
+                                "Elle risque de blesser mes freres et soeurs si je ne la garde pas.",
+                                "Se souvenir, c’est donner un sens à ce que nous avons vecu, merci pour cela.",
                                 "Je veille sur ce lieu pour que d'autres n'oublient pas notre histoire.",
-                                "Il est parfois difficile de rester ici seul, mais ton hommage me réconforte.",
-                                "Chaque hommage me rappelle que je ne suis pas totalement oublié. Mais tout hommage m'éloigne d'eux...",
-                                "Rester ici, entre le passé et l’oubli, est moins pesant grâce à toi... Mais je me demande ce qu'ils font ?...",
-                                "Je suis là pour protéger, même si cela signifie rester figé ici pour toujours. (aider moi à partir...)",
-                                "Ton hommage redonne de la vie à notre mémoire, merci.",
-                                "Je suis le gardien de ce passage, pour que d’autres puissent avancer en paix. (mais je n'arrive plus à tenir)",
-                                "Mon existence ici a plus de sens quand on vient me voir. (mais a-t-elle déjà eu un sens ? pourquoi je suis comme ça ? je ne suis pas bien...)",
-                                "Merci de respecter ce lieu sacré, tout le monde ne le fait pas.",
+                                "Il est parfois difficile de rester ici seul, mais ton hommage me reconforte.",
+                                "Chaque hommage me rappelle que je ne suis pas totalement oublie. Mais tout hommage m'eloigne d'eux...",
+                                "Rester ici, entre le passe et l’oubli, est moins pesant grâce à toi... Mais je me demande ce qu'ils font ?...",
+                                "Je suis la pour proteger, meme si cela signifie rester fige ici pour toujours. (aidez moi a partir...)",
+                                "Ton hommage redonne de la vie a notre memoire, merci.",
+                                "Je suis le gardien de ce passage, pour que d’autres puissent avancer en paix. (mais je n'arrive plus a tenir)",
+                                "Mon existence ici a plus de sens quand on vient me voir. (mais a-t-elle deja eu un sens ? pourquoi je suis comme ça ? je ne suis pas bien...)",
+                                "Merci de respecter ce lieu sacre, tout le monde ne le fait pas.",
                                 "Restez prudents, je veille ici pour que rien de mal ne survienne. (je peux pas dire que je vais lâcher)",
-                                "Ce n'est pas facile de protéger cet endroit, mais ta présence aide. (sans penser à cette autre présence)",
-                                "Je veille pour que la tranquillité règne ici, merci de me le rappeler.",
-                                "Il n’y a rien de plus précieux que le souvenir que vous m'offrez. (je commence à tout oublier, est-ce donc ça l'au-delà ?...)",
+                                "Ce n'est pas facile de proteger cet endroit, mais ta presence aide. (sans penser a cette autre presence)",
+                                "Je veille pour que la tranquillite regne ici, merci de me le rappeler.",
+                                "Il n’y a rien de plus precieux que le souvenir que vous m'offrez. (je commence a tout oublier, est-ce donc ça l'au-dela ?...)",
                                 "Parfois, la solitude est lourde ici, mais ton hommage adoucit cela. (je souhaite les rejoindre)"
                                 ]
         self.frame = 0
@@ -2104,7 +2113,7 @@ class Tombe:
 
     def check_collision_with_stele(self, bird) -> None:
         """
-        Vérifie la collision avec la tombe et empêche l'oiseau de passer au travers.
+        Verifie la collision avec la tombe et empeche l'oiseau de passer au travers.
         -----------------
         bird : instance de la classe de l'oiseau actuel
         """
@@ -2145,9 +2154,9 @@ class Tombe:
                 self.message = "Merci de m'avoir rendu hommage, je vais"
                 self.message_2 = "bientot pouvoir partir en paix"
                 self.show_message = True
-                self.pyxel_egal_caca.hommage.append(bird.to_dict())
+
             else :
-                la_grosse_phrase = random.choice(self.phrases_hommage)
+                la_grosse_phrase = self.phrases_hommage[17]
 
                 self.message_timer = 100 
                 self.pos_rect = (30, 10)
@@ -2155,61 +2164,111 @@ class Tombe:
                 self.message = "Tu m'as deja rendu hommage, merci quand meme."
 
                 if la_grosse_phrase == self.phrases_hommage[0]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Je ne sais pas combien de temps je vais devoir rester ici"
+                    self.message_3 = "pour veiller sur cette porte."
+                    self.pos_rect3 = (60, 140)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[1]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Cette tombe est tout ce qui me reste de mes freres et"
+                    self.message_3 = "soeurs..."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[2]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Elle risque de blesser mes freres et soeurs si je ne la "
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[3]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Se souvenir, c’est donner un sens à ce que nous avons vecu,"
+                    self.message_3 = "merci pour cela."
+                    self.pos_rect3 = (90, 80)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[4]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Je veille sur ce lieu pour que d'autres n'oublient pas notre "
+                    self.message_3 = "histoire."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[5]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Il est parfois difficile de rester ici seul, mais ton hommage "
+                    self.message_3 = "me reconforte."
+                    self.pos_rect3 = (90, 80)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[6]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Chaque hommage me rappelle que je ne suis pas totalement oublie."
+                    self.message_3 = "Mais tout hommage m'eloigne d'eux..."
+                    self.pos_rect3 = (45, 155)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[7]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Rester ici, entre le passe et l’oubli, est moins pesant grace"
+                    self.message_3 = "à toi... Mais je me demande ce qu'ils font ?..."
+                    self.pos_rect3 = (15, 205)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[8]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Je suis la pour proteger, meme si cela signifie rester fige  "
+                    self.message_3 = "ici pour toujours. (aidez moi a partir...)"
+                    self.pos_rect3 = (30, 185)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[9]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "   Ton hommage redonne de la vie a notre memoire, merci."
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[10]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[11]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[12]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[13]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[14]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[15]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[16]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "la_grosse_phrase"
+                    self.message_3 = "garde pas."
+                    self.pos_rect3 = (100, 60)
                     self.show_message = True
+                    self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[17]:
-                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.message_2 = "Parfois, la solitude est lourde ici, mais ton hommage adoucit cela. (je souhaite les rejoindre)"
+                    self.message_3 = "adoucit cela. (je souhaite les rejoindre) pas."
+                    self.pos_rect3 = (20, 200)
                     self.show_message = True
-
-                print("Tu m'as déjà rendu hommage, merci quand même. " + la_grosse_phrase)
+                    self.message_timer = 160
 
 
     def check_bird(self) -> None:
@@ -2227,21 +2286,29 @@ class Tombe:
                 self.particles.append(Particle(
                     4*8 + random.randint(0, 8),
                     47*8 + random.randint(0, 8),
-                    "bird"
+                    "portal"
                 ))
-                
         
         for particle in self.particles[:]:
             particle.x += particle.vx
             particle.y += particle.vy
             particle.life -= 1
             if particle.life <= 0:
-                self.particles.remove(particle)
-            else:
+                self.particles.remove(particle)       
+        
+
+    def draw_particles(self) -> None:
+        """
+        Dessine les particules du portail
+        """
+        if self.portail:
+            for particle in self.particles:
                 screen_x = particle.x - self.pyxel_egal_caca.camera_x
                 screen_y = particle.y - self.pyxel_egal_caca.camera_y
                 pyxel.pset(screen_x, screen_y, random.choice([2, 8]))
-                print("llalalalakakakakakkakaka")
+
+
+        
 
 
     def reset(self) -> None:

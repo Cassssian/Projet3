@@ -9,7 +9,9 @@
 ## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Présentation général</u></div>
 
 Birdies est un jeu de plateforme et d'exploration en 2D développé avec Pyxel, une bibliothèque de création de jeux rétro pour Python. Dans ce jeu, vous incarnez différents oiseaux aux capacités uniques, explorant un monde mystérieux rempli de défis, de secrets et d'énigmes à résoudre.
+
 --------------
+
 <br>
 
 ## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Objectifs du jeu</u></div>
