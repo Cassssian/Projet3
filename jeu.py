@@ -190,7 +190,7 @@ class Save:
                                     self.__pyxel_egal_caca.mode = "game"
 
                                 elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.click_ignore and len(visible_saves) != 1:
-                                    
+
                                     self.__pyxel_egal_caca.reset()
                                     self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
                                     self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
@@ -2264,6 +2264,7 @@ class End:
     """
     Classe pour la gestion de la fin du jeu
     """
+    
     def __init__(self, app) -> None:
         """
         Constructeur de la classe
@@ -2289,7 +2290,8 @@ class End:
 
     def detect(self, blue, red, green, blue_bird, red_bird, green_bird, stele) -> None:
         """
-        Fonction qui détecte si l'utilisateur a bien récuperé toutes les orbes, mis les oiseaux et les steles au bon endroit
+        Fonction qui détecte si l'utilisateur a bien récuperé toutes les orbes, 
+        mis les oiseaux et les steles au bon endroit
         -------------------------
         blue : Nombre d'orbes bleues
         red : Nombre d'orbes rouges
@@ -2306,7 +2308,7 @@ class End:
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
             self.pyxel_egal_caca.mode = "win"
-
+            self.pyxel_egal_caca.reset()
 
         elif blue != self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2435,6 +2437,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2459,6 +2462,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2483,6 +2487,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2543,6 +2548,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -2603,6 +2609,7 @@ class End:
         and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -2663,6 +2670,7 @@ class End:
         and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -2807,6 +2815,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (30, 10)
             self.taille_rect = (205, 30)
@@ -2814,7 +2823,6 @@ class End:
             self.show_message = True
 
 
-        
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
@@ -2832,6 +2840,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2856,6 +2865,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2880,6 +2890,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1]!= self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (40, 10)
             self.taille_rect = (190, 30)
@@ -2940,6 +2951,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -3000,6 +3012,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] != self.ry \
         and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -3060,6 +3073,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] != self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] != self.gx and stele.get_stele()[2][1] != self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (5, 10)
             self.taille_rect = (232, 30)
@@ -3204,6 +3218,7 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] != self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] != self.rx and stele.get_stele()[1][1] != self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] != self.gy:
+            
             self.message_timer = 100 
             self.pos_rect = (30, 10)
             self.taille_rect = (205, 30)
