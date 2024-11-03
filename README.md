@@ -120,7 +120,7 @@ Le jeu est organisé en plusieurs classes principales :
 
 <br>
 
-## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Fonctionnalitésd technique notables</u></div>
+## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Fonctionnalités technique notables</u></div>
 
 
 Système de collision basé sur les tuiles
