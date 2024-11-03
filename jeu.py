@@ -33,7 +33,7 @@ class Particle:
     """
     Classe qui gère les particules
     """
-    def __init__(self, x, y, particle_type="gauge"):
+    def __init__(self, x, y, particle_type="gauge") -> None:
         """
         Constructeur de la classe
         -----------------------
@@ -47,25 +47,30 @@ class Particle:
             self.vx = random.uniform(-1, 1)
             self.vy = random.uniform(-1, 1)
             self.color = random.choice([7, 9, 10])
-        else:  # bird particles
+        elif particle_type == "bird":
             self.vx = random.uniform(-2, 2)
             self.vy = random.uniform(-2, 2)
             self.color = random.choice([12, 7, 9])
+        elif particle_type == "portal":
+            self.vx = random.uniform(-1, 1)
+            self.vy = random.uniform(-2, 0)
+            self.color = random.choice([2, 8])
         self.life = random.randint(10, 20)
         self.type = particle_type
+
+
 
 
 class Save:
     """
     Classe pour la sauvegarde
     """
-    def __init__(self, app):
+    def __init__(self, app) -> None:
         """
         Initialisation de la sauvegarde
         """
         self.__save_file = "sauvegarde.json"
         self.__pyxel_egal_caca = app
-        self.scroll_position = 0
         self.click_ignore = True
 
 
@@ -84,19 +89,40 @@ class Save:
 
         try:
             with open(self.__save_file, "r") as f:
-                scores: list[{str, int}] = json.load(f)
-                partie = scores['Partie'].max()
+                saves_json: list[dict[str, int]] = json.load(f)
+                partie = max(entry['Partie'] for entry in saves_json if 'Partie' in entry)
         except FileNotFoundError:
-            scores: list[None] = []  # Si le fichier n'existe pas, commencer avec une liste vide
+            saves_json: list = []  # Si le fichier n'existe pas, commencer avec une liste vide
             partie = 0
+        
         # Ajouter les nouvelles données
-        scores.append({"Partie": partie + 1, "Date": [jour, mois, annee, [heure, minute, secondes]], "Orbes" : [self.__pyxel_egal_caca.blue_orb, self.__pyxel_egal_caca.red_orb, self.__pyxel_egal_caca.green_orb], "Pos Pos_cam" :[[self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y], [self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y]], "Actual bird": self.__pyxel_egal_caca.actual_bird.to_dict() if hasattr(self.__pyxel_egal_caca.actual_bird, 'to_dict') else str(type(self.__pyxel_egal_caca.actual_bird)),"Unlocked" : [[item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock],[item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock_stele]],"Bird pos" : [[self.__pyxel_egal_caca.blue_bird.x,self.__pyxel_egal_caca.blue_bird.y],[self.__pyxel_egal_caca.red_bird.x,self.__pyxel_egal_caca.red_bird.y],[self.__pyxel_egal_caca.green_bird.x,self.__pyxel_egal_caca.green_bird.y]],"Stele pos" : [[self.__pyxel_egal_caca.stele.blue_x,self.__pyxel_egal_caca.stele.blue_y],[self.__pyxel_egal_caca.stele.red_x,self.__pyxel_egal_caca.stele.red_y],[self.__pyxel_egal_caca.stele.green_x,self.__pyxel_egal_caca.stele.green_y]]})
+        saves_json.append({
+            "Partie": partie + 1,
+            "Date": [jour, mois, annee, [heure, minute, secondes]],
+            "Orbes": [self.__pyxel_egal_caca.blue_orb, self.__pyxel_egal_caca.red_orb, self.__pyxel_egal_caca.green_orb],
+            "Pos Pos_cam": [[self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y], [self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y]],
+            "Actual bird": self.__pyxel_egal_caca.actual_bird.to_dict() if hasattr(self.__pyxel_egal_caca.actual_bird, 'to_dict') else str(type(self.__pyxel_egal_caca.actual_bird)),
+            "Unlocked": [[item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock],
+                         [item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.unlock_stele]],
+            "Bird pos": [[self.__pyxel_egal_caca.blue_bird.x, self.__pyxel_egal_caca.blue_bird.y],
+                         [self.__pyxel_egal_caca.red_bird.x, self.__pyxel_egal_caca.red_bird.y],
+                         [self.__pyxel_egal_caca.green_bird.x, self.__pyxel_egal_caca.green_bird.y]],
+            "Stele pos": [[self.__pyxel_egal_caca.stele.blue_x, self.__pyxel_egal_caca.stele.blue_y],
+                          [self.__pyxel_egal_caca.stele.red_x, self.__pyxel_egal_caca.stele.red_y],
+                          [self.__pyxel_egal_caca.stele.green_x, self.__pyxel_egal_caca.stele.green_y]],
+            "Hommage": [item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.hommage],
+            "Items": [self.__pyxel_egal_caca.items_blue, self.__pyxel_egal_caca.items_red, 
+                      self.__pyxel_egal_caca.items_green]
+        })
         # Écrire les données mises à jour dans le fichier
         with open(self.__save_file, "w") as f:
-            json.dump(scores, f, indent=1)
+            json.dump(saves_json, f, indent=1)
     
 
-    def show_save(self):
+    def show_save(self) -> None:
+        """
+        Affiche la ou les sauvegarde(s)
+        """
         # Draw background panel with original dimensions
         pyxel.rect(30, 20, 196, 216, 5)
         pyxel.rectb(30, 20, 196, 216, 7)
@@ -109,7 +135,7 @@ class Save:
 
         try:
             with open(self.__save_file, "r") as f:
-                saves = json.load(f)
+                saves_json = json.load(f)
                 
             # Calculate scroll
             max_visible_saves = 4  # Adjusted for smaller window
@@ -117,12 +143,12 @@ class Save:
                 self.scroll_position = 0
                 
             if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.KEY_S):
-                self.scroll_position = min(len(saves) - max_visible_saves, self.scroll_position + 1)
+                self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
             if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.KEY_Z):
                 self.scroll_position = max(0, self.scroll_position - 1)
                 
             # Draw save buttons with scroll
-            visible_saves = saves[self.scroll_position:self.scroll_position + max_visible_saves]
+            visible_saves = saves_json[self.scroll_position:self.scroll_position + max_visible_saves]
             for i, save in enumerate(visible_saves):
                 button_y = 70 + i * 40
                 # Draw button background
@@ -132,6 +158,8 @@ class Save:
 
                 if self.__pyxel_egal_caca.is_button_clicked(button_save):
                                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and len(visible_saves) == 1:
+
+                                    self.__pyxel_egal_caca.reset()
                                     self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
                                     self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
                                     self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
@@ -152,9 +180,18 @@ class Save:
                                     self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
                                     self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
                                     self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.hommage = save["Hommage"]
+                                    self.__pyxel_egal_caca.items_blue = save["Items"][0]
+                                    self.__pyxel_egal_caca.items_red = save["Items"][1]
+                                    self.__pyxel_egal_caca.items_green = save["Items"][2]
+
+
+                                    self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
                                     self.__pyxel_egal_caca.mode = "game"
 
                                 elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.click_ignore and len(visible_saves) != 1:
+                                    
+                                    self.__pyxel_egal_caca.reset()
                                     self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
                                     self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
                                     self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
@@ -175,6 +212,13 @@ class Save:
                                     self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
                                     self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
                                     self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.hommage = save["Hommage"]
+                                    self.__pyxel_egal_caca.items_blue = save["Items"][0]
+                                    self.__pyxel_egal_caca.items_red = save["Items"][1]
+                                    self.__pyxel_egal_caca.items_green = save["Items"][2]
+
+
+                                    self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
                                     self.__pyxel_egal_caca.mode = "game"
 
                                 elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.click_ignore and len(visible_saves) != 1:
@@ -193,13 +237,13 @@ class Save:
                             222, 75,  # coin droit
                             7  # couleur blanche
                         )
-            if self.scroll_position + max_visible_saves < len(saves):
+            if self.scroll_position + max_visible_saves < len(saves_json):
 
                 high_button = {"x": 217, "y": 212, "w": 8, "h": 9}
                 self.__pyxel_egal_caca.draw_button(high_button, "    ")
                 if self.__pyxel_egal_caca.is_button_clicked(high_button):
                                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                                    self.scroll_position = min(len(saves) - max_visible_saves, self.scroll_position + 1)
+                                    self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
                 pyxel.tri(
                             220, 219,  # sommet inversé
                             218, 214,  # coin gauche
@@ -222,6 +266,7 @@ class Save:
             self.__pyxel_egal_caca.draw_button(launch_button, "Lancer")
             if self.__pyxel_egal_caca.is_button_clicked(launch_button):
                             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                self.__pyxel_egal_caca.reset()
                                 self.__pyxel_egal_caca.mode = "game"
 
             back_button = {"x": 90, "y": 200, "w": 80, "h": 20}
@@ -230,7 +275,13 @@ class Save:
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.__pyxel_egal_caca.mode = "menu"
 
-    def deserialisation(self, classe):
+
+    def deserialisation(self, classe : str) -> object:
+        """
+        Récupère l'objet correspondant à la classe passée en paramètre
+        ----------------
+        classe : classe correspondant à l'oiseau actuel
+        """
         if classe == "Bird1":
             return self.__pyxel_egal_caca.blue_bird
         elif classe == "Bird2":
@@ -238,7 +289,8 @@ class Save:
         elif classe == "Bird3":
             return self.__pyxel_egal_caca.green_bird
 
-    def restore_items(self, blue : list[tuple[int, float]], red : list[tuple[int, float]], green : list[tuple[int, float]]):
+
+    def restore_items(self, blue : list[tuple[int, float]], red : list[tuple[int, float]], green : list[tuple[int, float]]) -> None:
         """
         Replace des carrés vides sur les orbes pour reprendre correctement la partie
         ----------------
@@ -248,19 +300,22 @@ class Save:
         """
 
         for bleu in blue:
-            pyxel.tilemaps[0].pset(bleu, (0, 0))
+            pyxel.tilemaps[0].pset(bleu[0], bleu[1], (0, 0))
 
         for rouge in red:
-            pyxel.tilemaps[0].pset(rouge, (0, 0))
+            pyxel.tilemaps[0].pset(rouge[0], rouge[1], (0, 0))
 
         for vert in green:
-            pyxel.tilemaps[0].pset(vert, (0, 0))
+            pyxel.tilemaps[0].pset(vert[0], vert[1], (0, 0))
+
+
+
 
 class App:
     """
     Classe pour le jeu
     """
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialisation de l'application
         """
@@ -276,7 +331,9 @@ class App:
         # ======================= JEU =========================================
         self.x = 0
         self.y = 0
-        self.COLLIDERS = [(5, 0), (4, 1), (5, 1), (6, 0), (6, 1), (7, 0), (7, 1), (5, 2), (5, 3), (6, 2), (6, 3), (7, 2), (7, 3), (5, 4), (5, 5), (6, 4), (6, 5), (7, 4), (7, 5), (0, 5)]
+        self.COLLIDERS = [(5, 0), (4, 1), (5, 1), (6, 0), (6, 1), (7, 0), \
+                          (7, 1), (5, 2), (5, 3), (6, 2), (6, 3), (7, 2), (7, 3), (5, 4), \
+                          (5, 5), (6, 4), (6, 5), (7, 4), (7, 5), (0, 5)]
         self.special_colliders = [(1, 0)]
         self.mort_colliders = [(0, 3), (1, 3), (2, 3), (3, 3)]
         self.portail_colliders = [(1, 10)]
@@ -336,7 +393,7 @@ class App:
         pyxel.run(self.update, self.draw)
 
 
-    def update_camera(self):
+    def update_camera(self) -> None:
         """
         Méthode qui gère le mouvement de la caméra (fixe sur les côtés et bouge avec l'oiseau actuel 
         lorsqu'il n'est pas vers les bords de la map)
@@ -363,7 +420,7 @@ class App:
             self.camera_y = target_camera_y
 
 
-    def update(self):
+    def update(self) -> None:
         """
         Méthode qui gère les mises à jour du jeu
         """
@@ -393,6 +450,7 @@ class App:
             
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 if self.is_button_clicked(self.button_start):
+                    self.reset()
                     self.mode = "game"
                 elif self.is_button_clicked(self.sauvegarde):
                     self.save_class.scroll_position = 0
@@ -435,9 +493,8 @@ class App:
             if self.animation_timer_2 == 8:  
                 self.tombe.hauteur += self.ajout
 
-            if self.tombe.hauteur == 6 or self.tombe.hauteur == 0:
+            if self.tombe.hauteur == 6 or self.tombe.hauteur == 0 and self.ajout == -1:
                 self.ajout = -self.ajout
-            
             
 
             if self.animation_timer_2 > 12:
@@ -519,9 +576,9 @@ class App:
                 if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                         if self.red_orb >= 8:
-                            self.x, self.y = self.stele.tp_green  # Green bird shrine position
+                            self.x, self.y = self.stele.tp_green()  # Green bird shrine position
                             self.actual_bird = self.green_bird
-                            self.green_bird.goto(self.stele.tp_green)
+                            self.green_bird.goto(self.stele.tp_green())
                             self.mode = "game"
                             if not self.green_bird in self.unlock:
                                 self.unlock.append(self.green_bird)
@@ -618,17 +675,11 @@ class App:
                 self.reset()
 
         elif self.mode == "pause":
+            pyxel.mouse(True)
             pyxel.camera(0, 0)
-            pyxel.cls(0)
-            pyxel.text(120, 90, "PAUSE", 7)
-            retour_button = {"x": 90, "y": 125, "w": 80, "h": 20}
-            self.draw_button(retour_button, "Retour au jeu", pyxel.COLOR_BLACK)
-            if self.is_button_clicked(retour_button):
-                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                                self.mode = "game"
             
 
-    def draw(self):
+    def draw(self) -> None:
         """
         Méthode qui gère les dessins du jeu
         """
@@ -711,6 +762,12 @@ class App:
             pyxel.rect(self.SCREEN_WIDTH - 52, 46, charge_width, 6, 9)
             pyxel.rectb(self.SCREEN_WIDTH - 52, 45, 50, 8, 7)
 
+            if self.actual_bird == self.green_bird:
+                pyxel.rect(self.SCREEN_WIDTH - 52, 55, 50, 8, 1)
+                jauge_val = int((self.green_bird.flight_gauge / self.green_bird.max_flight_gauge) * 48)
+                pyxel.rect(self.SCREEN_WIDTH - 52, 56, jauge_val, 6, pyxel.COLOR_LIGHT_BLUE)
+
+
             if self.end.show_message:
                 pyxel.rect(self.end.pos_rect[0], self.end.pos_rect[1], self.end.taille_rect[0], self.end.taille_rect[1], pyxel.COLOR_BLACK)
                 pyxel.text(self.end.pos_rect[0] + 10, self.end.pos_rect[1] + 10, self.end.message, 7)
@@ -721,6 +778,18 @@ class App:
                 if self.end.message_timer <= 0:
                     self.end.show_message = False
 
+            if self.tombe.show_message:
+                pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
+                pyxel.text(self.tombe.pos_rect[0] + 10, self.tombe.pos_rect[1] + 10, self.tombe.message, 7)
+                if hasattr(self.tombe, "message_2") and self.actual_bird in self.hommage: 
+                    pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1] - 10, pyxel.COLOR_BLACK)
+                    pyxel.text(self.SCREEN_WIDTH - self.tombe.taille_rect[0] + self.tombe.pos_rect[0] + 10, self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.message_2, 7)
+                elif hasattr(self.tombe, "message_2") and not self.actual_bird in self.hommage:
+                    pyxel.rect(self.tombe.pos_rect[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.taille_rect[0], self.tombe.taille_rect[1] - 10, pyxel.COLOR_BLACK)
+                    pyxel.text(self.SCREEN_WIDTH - self.tombe.taille_rect[0] + 10, self.tombe.pos_rect[1] + self.tombe.taille_rect[1], self.tombe.message_2, 7)
+                self.tombe.message_timer -= 1
+                if self.tombe.message_timer <= 0:
+                    self.tombe.show_message = False
 
             self.actual_bird.draw_particles()
 
@@ -899,7 +968,7 @@ class App:
                                 pyxel.quit()
 
 
-    def draw_letter(self, letter : str, x : int, y : int, scale : int = 1, couleur : bool | int = True):
+    def draw_letter(self, letter : str, x : int, y : int, scale : int = 1, couleur : bool | int = True) -> None:
         """
         Méthode qui dessine des lettres en grande taille
         -------------------
@@ -910,7 +979,7 @@ class App:
         couleur : couleur de la lettre
         """
         
-        def scaled_rect(x, y, w, h, couleur : bool | int = True):
+        def scaled_rect(x, y, w, h, couleur : bool | int = True) -> None:
             """
             Fonction qui dessine un rectangle pour dessiner les lettres
             -------------------
@@ -1025,7 +1094,7 @@ class App:
             scaled_rect(x + 12, y + 4, 4, 9, couleur)
 
 
-    def draw_button(self, button, text, color : int = 5, border_color : int = 7, text_color : int = 7):
+    def draw_button(self, button : dict[str, int | float], text : str, color : int = 5, border_color : int = 7, text_color : int = 7) -> None:
         """
         Méthode qui dessine un bouton
         -------------------
@@ -1048,7 +1117,7 @@ class App:
             pyxel.text(text_x, text_y, text, color)
 
 
-    def is_button_clicked(self, button):
+    def is_button_clicked(self, button : dict[str, int | float]) -> bool :
         """
         Méthode qui vérifie si le bouton est survolé
         -------------------
@@ -1058,13 +1127,28 @@ class App:
                 button["y"] <= pyxel.mouse_y <= button["y"] + button["h"])
 
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Méthode qui permet de reset le jeu
         """
         self.blue_bird.reset()
         self.green_bird.reset()
         self.red_bird.reset()
+        self.tombe.reset()
+        self.end.reset()
+        
+        while self.items_blue:
+            blue = self.items_blue.pop()
+            pyxel.tilemaps[0].pset(blue[0], blue[1], (0, 1))
+
+        while self.items_red:
+            red = self.items_red.pop()
+            pyxel.tilemaps[0].pset(red[0], red[1], (0, 2))  
+        
+        while self.items_green:
+            green = self.items_green.pop()
+            pyxel.tilemaps[0].pset(green[0], green[1], (0, 3))
+        
         self.x = 0
         self.y = 0
         self.camera_x = 0
@@ -1075,6 +1159,20 @@ class App:
         self.blue_orb = 0
         self.red_orb = 0
         self.green_orb = 0
+        self.error_message = ""
+        self.error_timer = 0
+
+        self.animation_timer = 0
+        self.animation_timer_2 = 0
+
+        self.actual_bird = self.blue_bird
+        self.unlock = [self.blue_bird]
+        self.unlock_stele = [self.blue_bird]
+        self.hommage = []
+        self.items_blue = []
+        self.items_red = []
+        self.items_green = []
+
 
 
 
@@ -1082,7 +1180,7 @@ class Bird1:
     """
     Classe de l'oiseau bleu
     """
-    def __init__(self, app, stele):
+    def __init__(self, app, stele) -> None:
         """
         Constructeur de la classe Bird1
         -------------------
@@ -1104,14 +1202,13 @@ class Bird1:
         self.tp_max_charge = 104
         self.is_charging = False
         self.particles = []
-        self.bird_particles = []
         self.stele = stele
         self.teleport_jauge = 0
         self.teleport_jauge_max = 104
         self.waiting = 0
         
     
-    def right(self):
+    def right(self) -> None:
         """
         Méthode qui permet de faire bouger l'oiseau vers la droite
         """
@@ -1123,7 +1220,7 @@ class Bird1:
             self.pyxel_egal_caca.update_camera()
     
 
-    def left(self):
+    def left(self) -> None:
         """
         Méthode qui permet de faire bouger l'oiseau vers la gauche
         """
@@ -1135,7 +1232,7 @@ class Bird1:
             self.pyxel_egal_caca.update_camera()
 
 
-    def jump(self):
+    def jump(self) -> None:
         """
         Méthode qui permet de faire sauter l'oiseau
         """
@@ -1144,7 +1241,7 @@ class Bird1:
             self.bugs_bunny += 1
 
 
-    def update(self):
+    def update(self) -> None:
         """
         Méthode qui permet de mettre à jour l'oiseau
         """
@@ -1184,7 +1281,7 @@ class Bird1:
             
             else:
                 if self.is_charging and self.tp_charge >= self.tp_max_charge:
-                    self.goto(self.stele.tp_red())
+                    self.goto(self.stele.tp_blue())
                 self.is_charging = False
                 self.tp_charge = max(0, self.tp_charge - 1)
                 if self.waiting >= 20:
@@ -1217,7 +1314,7 @@ class Bird1:
         self.check_items_collision()
 
 
-    def draw_particles(self):
+    def draw_particles(self) -> None:
         """
         Méthode qui permet de dessiner les particules
         """
@@ -1233,7 +1330,7 @@ class Bird1:
             pyxel.pset(screen_x, screen_y, particle.color)
 
 
-    def draw(self):
+    def draw(self) -> None:
         """
         Méthode qui permet de dessiner l'oiseau
         """
@@ -1243,7 +1340,7 @@ class Bird1:
             pyxel.blt(self.x, self.y, 0, 8 * self.frame, 16, -8, 8, 2)
 
 
-    def check_collision_below(self, new_y):
+    def check_collision_below(self, new_y : int | float) -> bool:
         """
         Vérifie s'il y a une collision sous le joueur en fonction de sa nouvelle position `new_y`.
         --------------
@@ -1257,7 +1354,7 @@ class Bird1:
         return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS or left_tile in self.pyxel_egal_caca.special_colliders or right_tile in self.pyxel_egal_caca.special_colliders
     
 
-    def check_collision_right(self, new_x):
+    def check_collision_right(self, new_x : int) -> bool:
         """
         Vérifie s'il y a une collision à droite du joueur pour le déplacement horizontal.
         --------------
@@ -1270,7 +1367,7 @@ class Bird1:
         return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
 
 
-    def check_collision_left(self, new_x):
+    def check_collision_left(self, new_x : int) -> bool:
         """
         Vérifie s'il y a une collision à gauche du joueur pour le déplacement horizontal.
         --------------
@@ -1282,7 +1379,7 @@ class Bird1:
         return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
     
     
-    def check_collision_above(self, new_y):
+    def check_collision_above(self, new_y : int | float) -> bool:
         """
         Vérifie s'il y a une collision au-dessus du joueur en fonction de sa nouvelle position `new_y`.
         --------------
@@ -1295,7 +1392,8 @@ class Bird1:
         # Si l'une des tuiles au-dessus est un obstacle (collide), il y a une collision
         return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS
     
-    def check_items_collision(self):
+
+    def check_items_collision(self) -> None:
             """
             Vérifie les collisions avec les items et les efface si nécessaire.
             """
@@ -1309,24 +1407,32 @@ class Bird1:
                 self.pyxel_egal_caca.blue_orb += 1
                 self.pyxel_egal_caca.items_blue.append((tile_x, tile_y))
 
-    def reset(self):
+
+    def reset(self) -> None:
         """
         Réinitialise l'oiseau
         """
         self.x = 10
-        self.y = 50
+        self.y = 90
+        self.direction = "droite"
         self.velocity_y = 0
         self.bugs_bunny = 0
-        self.max_jumps = 3
         self.frame = 0
+        self.tp_charge = 0
+        self.is_charging = False
+        self.particles = []
+        self.teleport_jauge = 0
+        self.waiting = 0
 
-    def get_pos(self):
+
+    def get_pos(self) -> tuple[int, int | float] :
         """
         Méthode qui permet de renvoyer les coordonnées de l'oiseau
         """
         return (self.x, self.y)
 
-    def goto(self, tuple_x_y):
+
+    def goto(self, tuple_x_y) -> None:
         """
         Méthode qui permet de téléporter l'oiseau
         """
@@ -1337,18 +1443,22 @@ class Bird1:
         self.pyxel_egal_caca.y = tuple_x_y[1]
         self.pyxel_egal_caca.update_camera()
 
-    def set_stele(self):
+
+    def set_stele(self) -> None:
         """
         Méthode qui permet de placer la stèle de l'oiseau
         """
         self.stele.place_blue(self.x, self. y)
 
-    def to_dict(self):
+
+    def to_dict(self) -> str:
         """
-        Méthode qui permet de d'ajouter l'oiseau pour la sauvegarde
+        Méthode qui permet d'ajouter la classe de l'oiseau pour la sauvegarde
         """
         return "Bird1"
-    
+
+
+
 
 class Bird2:
     def __init__(self, app, stele):
@@ -1364,16 +1474,15 @@ class Bird2:
         self.pyxel_egal_caca = app
         self.def_speed = 2
         self.tp_charge = 0
-        self.tp_max_charge = 100
+        self.tp_max_charge = 104
         self.is_charging = False
         self.particles = []
-        self.bird_particles = []
         self.stele = stele
         self.teleport_jauge = 0
-        self.teleport_jauge_max = 100
+        self.teleport_jauge_max = 104
         self.waiting = 0
 
-    def right(self):
+    def right(self) -> None:
         new_x = self.x + self.def_speed  # Déplacer le joueur vers la droite
         # Vérifier la collision avec la tuile à droite du joueur
         if self.check_collision_right(new_x):
@@ -1382,7 +1491,7 @@ class Bird2:
             self.pyxel_egal_caca.update_camera()
     
 
-    def left(self):
+    def left(self) -> None:
         new_x = self.x - self.def_speed  # Déplacer le joueur vers la droite
         # Vérifier la collision avec la tuile à droite du joueur
         if self.check_collision_left(new_x):
@@ -1391,18 +1500,20 @@ class Bird2:
             self.pyxel_egal_caca.update_camera()
 
 
-    def jump(self):
+    def jump(self) -> None:
         if self.bugs_bunny < self.max_jumps:
             self.velocity_y = self.jump_strength
             self.bugs_bunny += 1
 
-    def draw(self):
+
+    def draw(self) -> None:
         if self.direction == "droite":
             pyxel.blt(self.x, self.y, 0, 8 * self.frame + 16, 24, 8, 8, 2)
         else:
             pyxel.blt(self.x, self.y, 0, 8 * self.frame + 16, 24, -8, 8, 2)
 
-    def update(self):
+
+    def update(self) -> None:
         # Apply gravity
         self.velocity_y += self.gravity
         new_y = self.y + self.velocity_y
@@ -1470,7 +1581,8 @@ class Bird2:
 
         self.check_items_collision()
 
-    def check_collision_below(self, new_y):
+
+    def check_collision_below(self, new_y : int | float) -> bool :
         """
         Vérifie s'il y a une collision sous le joueur en fonction de sa nouvelle position `new_y`.
         --------------
@@ -1484,7 +1596,7 @@ class Bird2:
         return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS or left_tile in self.pyxel_egal_caca.special_colliders or right_tile in self.pyxel_egal_caca.special_colliders
     
 
-    def check_collision_right(self, new_x):
+    def check_collision_right(self, new_x : int) -> bool:
         """
         Vérifie s'il y a une collision à droite du joueur pour le déplacement horizontal.
         --------------
@@ -1497,7 +1609,7 @@ class Bird2:
         return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
 
 
-    def check_collision_left(self, new_x):
+    def check_collision_left(self, new_x : int) -> bool:
         """
         Vérifie s'il y a une collision à gauche du joueur pour le déplacement horizontal.
         --------------
@@ -1509,7 +1621,7 @@ class Bird2:
         return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
     
     
-    def check_collision_above(self, new_y):
+    def check_collision_above(self, new_y : int | float) -> bool:
         """
         Vérifie s'il y a une collision au-dessus du joueur en fonction de sa nouvelle position `new_y`.
         --------------
@@ -1522,7 +1634,8 @@ class Bird2:
         # Si l'une des tuiles au-dessus est un obstacle (collide), il y a une collision
         return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS
     
-    def check_items_collision(self):
+
+    def check_items_collision(self) -> None:
         tile_x = self.x // 8
         tile_y = self.y // 8
 
@@ -1532,10 +1645,12 @@ class Bird2:
             pyxel.tilemaps[0].pset(tile_x, tile_y, (0, 0))
             self.pyxel_egal_caca.red_orb += 1
 
-    def set_stele(self):
+
+    def set_stele(self) -> None:
         self.stele.place_red(self.x, self.y)
 
-    def draw_particles(self):
+
+    def draw_particles(self) -> None:
         for particle in self.particles:
             if particle.type == "gauge":
                 # Draw gauge particles relative to screen
@@ -1547,14 +1662,29 @@ class Bird2:
                 screen_y = particle.y - self.pyxel_egal_caca.camera_y
             pyxel.pset(screen_x, screen_y, particle.color)
 
-    def reset(self):
-        self.x = 50
-        self.y = 50
 
-    def get_pos(self):
+    def reset(self) -> None:
+        self.x = 0
+        self.y = 0
+        self.direction = "droite"
+        self.velocity_y = 0
+        self.bugs_bunny = 0
+        self.frame = 0
+        self.tp_charge = 0
+        self.is_charging = False
+        self.particles = []
+        self.teleport_jauge = 0
+        self.waiting = 0
+
+
+    def get_pos(self) -> tuple[int, int | float] :
+        """
+        Méthode qui permet de récupérer les coordonnées de l'oiseau rouge
+        """
         return (self.x, self.y)
     
-    def goto(self, tuple_x_y):
+
+    def goto(self, tuple_x_y) -> None:
         self.x = tuple_x_y[0]
         self.y = tuple_x_y[1]
         self.teleport_jauge = 0
@@ -1562,24 +1692,237 @@ class Bird2:
         self.pyxel_egal_caca.y = tuple_x_y[1]
         self.pyxel_egal_caca.update_camera()
 
-    def to_dict(self):
+
+    def to_dict(self) -> str:
+        """
+        Méthode qui permet d'ajouter la classe de l'oiseau pour la sauvegarde
+        """
         return "Bird2"
+
+
 
 
 class Bird3:
     def __init__(self, app, stele):
-        self.x = 50
-        self.y = 50
+        self.x = 0
+        self.y = 0
+        self.direction = "droite"
+        self.velocity_y = 0
+        self.bugs_bunny = 0
+        self.max_jumps = 1
+        self.gravity = 0.1
+        self.jump_strength = -2
+        self.frame = 0
         self.pyxel_egal_caca = app
-    
-    def reset(self):
-        self.x = 50
-        self.y = 50
+        self.def_speed = 2
+        self.flight_gauge = 100
+        self.max_flight_gauge = 100
+        self.tp_charge = 0
+        self.tp_max_charge = 104
+        self.is_charging = False
+        self.particles = []
+        self.particles_teleport = []
+        self.stele = stele
+        self.teleport_jauge = 0
+        self.teleport_jauge_max = 104
+        self.waiting = 0
+        self.waiting_particles = 0
 
-    def get_pos(self):
+
+    def right(self) -> None:
+        new_x = self.x + self.def_speed
+        if self.check_collision_right(new_x):
+            self.x = min(new_x, self.pyxel_egal_caca.map_width - 17)
+            self.pyxel_egal_caca.update_camera()
+
+
+    def left(self) -> None:
+        new_x = self.x - self.def_speed
+        if self.check_collision_left(new_x):
+            self.x = max(1, self.x - self.def_speed)
+            self.pyxel_egal_caca.update_camera()
+
+
+    def jump(self) -> None:
+        if self.bugs_bunny < self.max_jumps:
+            self.velocity_y = self.jump_strength
+            self.bugs_bunny += 1
+
+
+    def update(self) -> None:
+        if pyxel.btn(pyxel.KEY_SPACE) and self.flight_gauge > 0:
+            self.velocity_y = -1
+            self.flight_gauge = max(0, self.flight_gauge - 1)
+            # Add blue particles during flight
+            if random.random() < 0.4:
+                self.particles.append(Particle(
+                    self.x + random.randint(0, 8),
+                    self.y + random.randint(4, 8),
+                    "bird"
+                ))
+            if pyxel.btn(pyxel.KEY_RIGHT):
+                self.right()
+                self.direction = "droite"
+            if pyxel.btn(pyxel.KEY_LEFT):
+                self.left()
+                self.direction = "gauche"
+        else:
+            self.velocity_y += self.gravity
+            if self.waiting >= 20 and not pyxel.btn(pyxel.KEY_SPACE):
+                self.flight_gauge = min(self.flight_gauge + 1, self.max_flight_gauge)
+                self.waiting = 0
+            else:
+                self.waiting += 1
+
+        # Update particles
+        for particle in self.particles[:]:
+            particle.x += particle.vx
+            particle.y += particle.vy
+            particle.life -= 1
+            if particle.life <= 0:
+                self.particles.remove(particle)
+
+        new_y = self.y + self.velocity_y
+
+        if self.check_collision_below(new_y):
+            self.y = (new_y // 8) * 8
+            self.velocity_y = 0
+            self.bugs_bunny = 0
+        else:
+            if not self.check_collision_above(new_y):
+                self.y = new_y
+
+
+        if self.velocity_y > 4:
+            self.velocity_y = 4
+
+        if pyxel.btn(pyxel.KEY_T):
+            if self.teleport_jauge == self.teleport_jauge_max:
+                self.is_charging = True
+                self.tp_charge = min(self.tp_charge + 2, self.tp_max_charge)
+                # Gauge particles
+                if random.random() < 0.3:
+                    charge_x = self.pyxel_egal_caca.SCREEN_WIDTH - 59 + int((self.tp_charge / self.tp_max_charge) * 48)
+                    self.particles_teleport.append(Particle(charge_x, 50, "gauge"))
+                # Bird particles while charging
+                if random.random() < 0.4:
+                    self.particles_teleport.append(Particle(
+                        self.x + random.randint(0, 8),
+                        self.y + random.randint(0, 8),
+                        "bird"
+                    ))
+            
+            else:
+                if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                    self.goto(self.stele.tp_green())
+                self.is_charging = False
+                self.tp_charge = max(0, self.tp_charge - 1)
+                if self.waiting_particles >= 20:
+                    self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                    self.waiting_particles = 0
+                else:
+                    self.waiting_particles += 1
+
+        else:
+            if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.goto(self.stele.tp_green())
+            self.is_charging = False
+            self.tp_charge = max(0, self.tp_charge - 1)
+            if self.waiting_particles >= 2:
+                self.teleport_jauge = min(self.teleport_jauge + 1, 104)
+                self.waiting_particles = 0
+            else:
+                self.waiting_particles += 1
+
+        # Update particles
+        for particle in self.particles_teleport[:]:
+            if particle.type == "bird":
+                particle.vy += 0.1  # Add gravity to bird particles
+            particle.x += particle.vx
+            particle.y += particle.vy
+            particle.life -= 1
+            if particle.life <= 0:
+                self.particles_teleport.remove(particle)
+
+        self.check_items_collision()
+
+
+    def draw(self) -> None:
+        if self.direction == "droite":
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame, 24, 8, 8, 2)
+        else:
+            pyxel.blt(self.x, self.y, 0, 8 * self.frame, 24, -8, 8, 2)
+
+
+    def check_collision_below(self, new_y : int | float) -> bool :
+        """
+        Vérifie s'il y a une collision sous le joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 6 + self.def_speed) // 8)
+        right_tile = pyxel.tilemaps[0].pget((self.x + 8) // 8, (new_y + 6 + self.def_speed) // 8)
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS or left_tile in self.pyxel_egal_caca.special_colliders or right_tile in self.pyxel_egal_caca.special_colliders
+
+
+    def check_collision_right(self, new_x : int) -> bool:
+        """
+        Vérifie s'il y a une collision à droite du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, self.y // 8)
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, (self.y + 7) // 8)
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+
+
+    def check_collision_left(self, new_x : int) -> bool:
+        """
+        Vérifie s'il y a une collision à gauche du joueur pour le déplacement horizontal.
+        --------------
+        new_x : position x du zoiseaux
+        """
+        top_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, self.y // 8)
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + 2 - self.def_speed) // 8, (self.y + 7) // 8)
+        return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
+
+
+    def check_collision_above(self, new_y : int | float) -> bool:
+        """
+        Vérifie s'il y a une collision au-dessus du joueur en fonction de sa nouvelle position `new_y`.
+        --------------
+        new_y : position y du zoiseaux
+        """
+        left_tile = pyxel.tilemaps[0].pget(self.x // 8, (new_y + 1 - self.def_speed) // 8)
+        right_tile = pyxel.tilemaps[0].pget((self.x + 7) // 8, (new_y + 1 - self.def_speed) // 8)
+        return left_tile in self.pyxel_egal_caca.COLLIDERS or right_tile in self.pyxel_egal_caca.COLLIDERS
+
+
+    def reset(self) -> None:
+        self.x = 0
+        self.y = 0
+        self.direction = "droite"
+        self.velocity_y = 0
+        self.bugs_bunny = 0
+        self.frame = 0
+        self.flight_gauge = 100
+        self.tp_charge = 0
+        self.is_charging = False
+        self.particles = []
+        self.particles_teleport = []
+        self.teleport_jauge = 0
+        self.waiting = 0
+        self.waiting_particles = 0
+
+
+    def get_pos(self) -> tuple[int, int | float]:
+        """
+        Méthode qui permet de récupérer les coordonnées de l'oiseau vert
+        """
         return (self.x, self.y)
 
-    def goto(self, tuple_x_y):
+
+    def goto(self, tuple_x_y) -> None:
         self.x = tuple_x_y[0]
         self.y = tuple_x_y[1]
         self.teleport_jauge = 0
@@ -1587,25 +1930,54 @@ class Bird3:
         self.pyxel_egal_caca.y = tuple_x_y[1]
         self.pyxel_egal_caca.update_camera()
 
-    def check_items_collision(self):
+
+    def check_items_collision(self) -> None:
         tile_x = self.x // 8
         tile_y = self.y // 8
 
         tile = pyxel.tilemaps[0].pget(tile_x, tile_y)
 
-        if tile == (1, 2):
+        if tile == (2, 1):
             pyxel.tilemaps[0].pset(tile_x, tile_y, (0, 0))
             self.pyxel_egal_caca.green_orb += 1
+            self.pyxel_egal_caca.items_green.append((tile_x, tile_y))
 
-    def to_dict(self):
+
+    def draw_particles(self) -> None:
+        """
+        Méthode qui permet de dessiner les particules
+        """
+        for particle in self.particles:
+            screen_x = particle.x - self.pyxel_egal_caca.camera_x
+            screen_y = particle.y - self.pyxel_egal_caca.camera_y
+            pyxel.pset(screen_x, screen_y, particle.color)
+
+        for particle in self.particles_teleport:
+            if particle.type == "gauge":
+                # Draw gauge particles relative to screen
+                screen_x = particle.x
+                screen_y = particle.y
+            else:
+                # Draw bird particles relative to world
+                screen_x = particle.x - self.pyxel_egal_caca.camera_x
+                screen_y = particle.y - self.pyxel_egal_caca.camera_y
+            pyxel.pset(screen_x, screen_y, particle.color)
+
+
+    def to_dict(self) -> str:
+        """
+        Méthode qui permet d'ajouter la classe de l'oiseau pour la sauvegarde
+        """
         return "Bird3"
+
+
 
 
 class Stele:
     """
     Classe pour la gestion des stèles des oiseaux
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.blue_x = 3 * 8
         self.blue_y = 14 * 8
         self.red_x = 22 * 8
@@ -1613,37 +1985,59 @@ class Stele:
         self.green_x = 114 * 8
         self.green_y = 8
     
-    def blue(self):
+
+    def blue(self) -> None:
         pyxel.blt(self.blue_x, self.blue_y, 0, 0, 72, 8, 8, pyxel.COLOR_PURPLE)
 
-    def red(self):
+
+    def red(self) -> None:
         pyxel.blt(self.red_x, self.red_y, 0, 8, 64, 8, 8, pyxel.COLOR_PURPLE)
 
-    def green(self):
+
+    def green(self) -> None:
         pyxel.blt(self.green_x, self.green_y, 0, 0, 64, 8, 8, pyxel.COLOR_PURPLE)
 
-    def place_blue(self, x, y):
+
+    def place_blue(self, x, y) -> None:
         self.blue_x = x
         self.blue_y = y
 
-    def place_green(self, x, y):
+
+    def place_green(self, x, y) -> None:
         self.green_x = x
         self.green_y = y
     
-    def place_red(self, x, y):
+
+    def place_red(self, x, y) -> None:
         self.red_x = x
         self.red_y = y
 
-    def tp_blue(self):
+
+    def tp_blue(self) -> tuple[int, int | float] :
+        """
+        Méthode qui permet de récupérer les coordonnées de la stèle bleue
+        """
         return self.blue_x, self.blue_y
     
-    def tp_red(self):
+
+    def tp_red(self) -> tuple[int, int | float] :
+        """
+        Méthode qui permet de récupérer les coordonnées de la stèle rouge
+        """
         return self.red_x, self.red_y
 
-    def tp_green(self):
+
+    def tp_green(self) -> tuple[int, int | float] :
+        """
+        Méthode qui permet de récupérer les coordonnées de la stèle verte
+        """
         return self.green_x, self.green_y
 
-    def reset(self):
+
+    def reset(self) -> None:
+        """
+        Méthode qui réinitialise les attributs de la classe
+        """
         self.blue_x = 3 * 8
         self.blue_y = 14 * 8
         self.red_x = 22 * 8
@@ -1651,8 +2045,14 @@ class Stele:
         self.green_x = 114 * 8
         self.green_y = 8
 
-    def get_stele(self):
+
+    def get_stele(self) -> tuple[tuple[int, int | float], tuple[int, int | float], tuple[int, int | float]] :
+        """
+        Méthode qui permet de récupérer les coordonnées des stèles
+        """
         return (self.blue_x, self.blue_y), (self.red_x, self.red_y), (self.green_x, self.green_y)
+
+
 
 
 class Tombe:
@@ -1692,9 +2092,17 @@ class Tombe:
                                 ]
         self.frame = 0
         self.hauteur = 0
+        self.message_timer = 100
+        self.message = ""
+        self.pos_rect = (0, 0)
+        self.taille_rect = (0, 0)
+        self.show_message = False
+        self.portail = False
+        self.travel_portail = False
+        self.particles = []
         
 
-    def check_collision_with_stele(self, bird):
+    def check_collision_with_stele(self, bird) -> None:
         """
         Vérifie la collision avec la tombe et empêche l'oiseau de passer au travers.
         -----------------
@@ -1702,13 +2110,24 @@ class Tombe:
         """
         # Vérifie la collision en fonction de la direction de l'oiseau
         if bird.x < self.x + self.width and bird.x + 8 > self.x and \
-           bird.y < self.y + self.height and bird.y + 8 > self.y: # le \ sert à diviser la condition sinon le cobra comprendra que c'est deux instructions distrinctes. il ne se méfie pas assez
-            if bird.direction == "droite":
-                bird.x = self.x - 8
-            elif bird.direction == "gauche":
-                bird.x = self.x + self.width
+        bird.y < self.y + self.height and bird.y + 8 > self.y: # le \ sert à diviser la condition sinon le cobra comprendra que c'est deux instructions distrinctes. il ne se méfie pas assez
+            if len(self.pyxel_egal_caca.hommage) != 3: 
+                if bird.direction == "droite":
+                    bird.x = self.x - 8
+                elif bird.direction == "gauche":
+                    bird.x = self.x + self.width
 
-    def check_homage(self, bird):
+            else:
+                bird.goto((91*8,14*8))
+                self.travel_portail = True
+                
+        if bird.x >= 92*8 - 2 and bird.y <= 14*8 and self.travel_portail:
+            bird.goto(self.pyxel_egal_caca.stele.tp_blue()) if bird == self.pyxel_egal_caca.blue_bird \
+                                else bird.goto(self.pyxel_egal_caca.stele.tp_red()) if bird == self.pyxel_egal_caca.red_bird \
+                                else bird.goto(self.pyxel_egal_caca.stele.tp_green())
+    
+    
+    def check_homage(self, bird) -> None:
         """
         Vérifie si l'utilisateur appuie sur le 'h' et que l'oiseau est à proximité de la tombe.
         -----------------
@@ -1720,19 +2139,127 @@ class Tombe:
         # Si l'oiseau est dans une zone de 45 pixels autour de la tombe et que 'h' est appuyé
         if distance_x <= 45 and distance_y <= 45 and pyxel.btnp(pyxel.KEY_H):
             if not bird.to_dict() in self.pyxel_egal_caca.hommage: 
-                print("Merci de m'avoir rendu hommage, je vais bientôt pouvoir partir en paix")
+                self.message_timer = 100 
+                self.pos_rect = (40, 10)
+                self.taille_rect = (190, 30)
+                self.message = "Merci de m'avoir rendu hommage, je vais"
+                self.message_2 = "bientot pouvoir partir en paix"
+                self.show_message = True
                 self.pyxel_egal_caca.hommage.append(bird.to_dict())
             else :
-                print("Tu m'as déjà rendu hommage, merci quand même. " + random.choice(self.phrases_hommage))
+                la_grosse_phrase = random.choice(self.phrases_hommage)
 
-    def check_bird(self):
+                self.message_timer = 100 
+                self.pos_rect = (30, 10)
+                self.taille_rect = (200, 30)
+                self.message = "Tu m'as deja rendu hommage, merci quand meme."
+
+                if la_grosse_phrase == self.phrases_hommage[0]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[1]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[2]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[3]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[4]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[5]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[6]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[7]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[8]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[9]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[10]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[11]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[12]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[13]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[14]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[15]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[16]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+                elif la_grosse_phrase == self.phrases_hommage[17]:
+                    self.message_2 = "bientot pouvoir partir en paix"
+                    self.show_message = True
+
+                print("Tu m'as déjà rendu hommage, merci quand même. " + la_grosse_phrase)
+
+
+    def check_bird(self) -> None:
         """
         Vérifie si tout les oiseaux ont rendu hommage au défunt oiseau
         """
         if len(self.pyxel_egal_caca.hommage) != 3:
             pyxel.blt(4*8, 41*8 + self.hauteur * 2, 0, self.frame * 8 + 16, 64, 8, 8, pyxel.COLOR_PURPLE)
+        if len(self.pyxel_egal_caca.hommage) == 3 and not self.portail:
+            pyxel.tilemaps[0].pset(4, 47, (3, 9))
+            self.portail = True
+        
+        if self.portail:
+            if random.random() < 0.3:
+                self.particles.append(Particle(
+                    4*8 + random.randint(0, 8),
+                    47*8 + random.randint(0, 8),
+                    "bird"
+                ))
+                
+        
+        for particle in self.particles[:]:
+            particle.x += particle.vx
+            particle.y += particle.vy
+            particle.life -= 1
+            if particle.life <= 0:
+                self.particles.remove(particle)
+            else:
+                screen_x = particle.x - self.pyxel_egal_caca.camera_x
+                screen_y = particle.y - self.pyxel_egal_caca.camera_y
+                pyxel.pset(screen_x, screen_y, random.choice([2, 8]))
+                print("llalalalakakakakakkakaka")
+
+
+    def reset(self) -> None:
+        """
+        Méthode qui réinitialise les attributs de la classe
+        """
+        self.frame = 0
+        self.hauteur = 0
+        self.message_timer = 100
+        self.message = ""
+        self.show_message = False
+        self.portail = False
+        self.travel_portail = False
+        self.particles = []
+
 
  
+
 class End:
     """
     Classe pour la gestion de la fin du jeu
@@ -1753,16 +2280,16 @@ class End:
         self.ry = 56    
         self.gx = 252 * 8
         self.gy = 72
-        self.message_timer = 100  # Will show for 60 frames
+        self.message_timer = 100
         self.message = ""
         self.pos_rect = (0, 0)
         self.taille_rect = (0, 0)
         self.show_message = False
 
 
-    def detect(self, blue, red, green, blue_bird, red_bird, green_bird, stele):
+    def detect(self, blue, red, green, blue_bird, red_bird, green_bird, stele) -> None:
         """
-        Fonction qui détecte si l'utilisateur a bien récuéperer toutes les orbes, mis les oiseaux et les steles au bon endroit
+        Fonction qui détecte si l'utilisateur a bien récuperé toutes les orbes, mis les oiseaux et les steles au bon endroit
         -------------------------
         blue : Nombre d'orbes bleues
         red : Nombre d'orbes rouges
@@ -1777,7 +2304,9 @@ class End:
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
+            
             self.pyxel_egal_caca.mode = "win"
+
 
         elif blue != self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -1791,6 +2320,7 @@ class End:
             self.message = f"Tu as oublie une orbe bleue ! Mefies-toi !!" if self.blue - blue == 1 else f"Tu as oublie {self.blue-blue} orbes bleues ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red != self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -1803,6 +2333,7 @@ class End:
             self.message = f"Tu as oublie une orbe rouge ! Mefies-toi !!" if self.red - red == 1 else f"Tu as oublie {self.red-red} orbes rouges ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red == self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -1814,6 +2345,7 @@ class End:
             self.taille_rect = (190, 30)
             self.message = f"Tu as oublie une orbe verte ! Mefies-toi !!" if self.green - green == 1 else f"Tu as oublie {self.green-green} orbes vertes ! Mefies-toi !!"
             self.show_message = True
+
 
         elif blue != self.blue and red != self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -1830,6 +2362,7 @@ class End:
                 f"Tu as oublie {self.blue-blue} orbes bleues et {self.red-red} orbes rouges !"
             self.show_message = True
 
+
         elif blue != self.blue and red == self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -1845,6 +2378,7 @@ class End:
                 f"Tu as oublie {self.blue-blue} orbes bleues et {self.green-green} orbes vertes !"
             self.show_message = True
 
+
         elif blue == self.blue and red != self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -1859,6 +2393,7 @@ class End:
                 f"Tu as oublie une orbe rouge et {self.green-green} orbes vertes !" if self.red - red == 1 and self.green - green != 1 else \
                 f"Tu as oublie {self.red-red} orbes rouges et {self.green-green} orbes vertes !"
             self.show_message = True
+
         
         elif blue != self.blue and red != self.red and green != self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -1880,6 +2415,7 @@ class End:
                 f"{self.green-green} orbes vertes !" if self.blue - blue == 1 and self.red - red == 1 and self.green - green != 1 else \
                 f"et {self.green-green} orbes vertes !"
             self.show_message = True
+
         
 
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
@@ -1905,6 +2441,7 @@ class End:
             self.message = f"L'oiseau bleu est mal placee ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -1927,6 +2464,7 @@ class End:
             self.taille_rect = (190, 30)
             self.message = f"L'oiseau rouge est mal placee ! Mefies-toi !!"
             self.show_message = True
+
         
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -1950,6 +2488,7 @@ class End:
             self.taille_rect = (190, 30)
             self.message = f"L'oiseau vert est mal placee ! Mefies-toi !!"
             self.show_message = True
+
 
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
         and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
@@ -2010,6 +2549,7 @@ class End:
             self.message = f"L'oiseau bleu et rouge sont mal places ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
         and green_bird.get_pos()[0] != self.gx and green_bird.get_pos()[1] != self.gy and stele.get_stele()[0][0] == self.bx \
@@ -2068,6 +2608,7 @@ class End:
             self.taille_rect = (232, 30)
             self.message = f"L'oiseau rouge et vert sont mal places ! Mefies-toi !!"
             self.show_message = True
+
         
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
         and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2127,6 +2668,7 @@ class End:
             self.taille_rect = (232, 30)
             self.message = f"L'oiseau bleu et vert sont mal places ! Mefies-toi !!"
             self.show_message = True
+
 
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] != self.bx \
         and blue_bird.get_pos()[1] != self.by and red_bird.get_pos()[0] != self.rx and red_bird.get_pos()[1] != self.ry \
@@ -2271,6 +2813,7 @@ class End:
             self.message = f"L'oiseau bleu, rouge et vert sont mal places !"
             self.show_message = True
 
+
         
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2295,6 +2838,7 @@ class End:
             self.message = f"La stele bleue est mal placee ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -2317,6 +2861,7 @@ class End:
             self.taille_rect = (190, 30)
             self.message = f"La stele rouge est mal placee ! Mefies-toi !!"
             self.show_message = True
+
         
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2340,6 +2885,7 @@ class End:
             self.taille_rect = (190, 30)
             self.message = f"La stele verte est mal placee ! Mefies-toi !!"
             self.show_message = True
+
 
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2400,6 +2946,7 @@ class End:
             self.message = f"La stele bleue et rouge sont mal placees ! Mefies-toi !!"
             self.show_message = True
 
+
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
         and green_bird.get_pos()[0] == self.gx and green_bird.get_pos()[1] == self.gy and stele.get_stele()[0][0] == self.bx \
@@ -2458,6 +3005,7 @@ class End:
             self.taille_rect = (232, 30)
             self.message = f"La stele rouge et verte sont mal placees ! Mefies-toi !!"
             self.show_message = True
+
         
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2517,6 +3065,7 @@ class End:
             self.taille_rect = (232, 30)
             self.message = f"La stele bleue et verte sont mal placees ! Mefies-toi !!"
             self.show_message = True
+
 
         elif blue == self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
@@ -2660,6 +3209,16 @@ class End:
             self.taille_rect = (205, 30)
             self.message = f"La stele bleue, rouge et verte sont mal placees !"
             self.show_message = True
+
+
+    def reset(self) -> None:
+        """
+        Méthode qui réinitialise les attributs de la classe
+        """
+        self.message_timer = 100
+        self.message = ""
+        self.show_message = False
+
 
 
 
