@@ -1,12 +1,8 @@
-<div style="background: linear-gradient(to right, #003300, #009900, #00cc99, #66ff33, #99ff66); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3em; text-align: center;">
-    <u> Projet 3</u>
-</div>
+<center> <img src="Img/projet3.png"> </center>
 
 ---
 
-<div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3em; text-align: center;">
-    <u> Birdies </u>
-</div>
+<center> <img src="Img/birdies.png"> </center>
 
 ---
 
@@ -120,8 +116,7 @@ Le jeu est organisé en plusieurs classes principales :
 
 <br>
 
-## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Fonctionnalitésd technique notables</u></div>
-
+## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Fonctionnalités technique notables</u></div>
 
 Système de collision basé sur les tuiles
 
