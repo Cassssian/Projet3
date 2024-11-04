@@ -110,7 +110,7 @@ class Save:
             "Stele pos": [[self.__pyxel_egal_caca.stele.blue_x, self.__pyxel_egal_caca.stele.blue_y],
                           [self.__pyxel_egal_caca.stele.red_x, self.__pyxel_egal_caca.stele.red_y],
                           [self.__pyxel_egal_caca.stele.green_x, self.__pyxel_egal_caca.stele.green_y]],
-            "Hommage": [item.to_dict() if hasattr(item, 'to_dict') else str(type(item)) for item in self.__pyxel_egal_caca.hommage],
+            "Hommage": self.__pyxel_egal_caca.hommage,
             "Items": [self.__pyxel_egal_caca.items_blue, self.__pyxel_egal_caca.items_red, 
                       self.__pyxel_egal_caca.items_green]
         })
@@ -383,6 +383,9 @@ class App:
         self.items_blue = []
         self.items_red = []
         self.items_green = []
+        self.wait = 0
+        self.show_wait = True
+        self.wait_timer = 100
         # =============== END =======================
         
 
@@ -488,6 +491,10 @@ class App:
         elif self.mode == "game":
             self.x = self.actual_bird.x
             self.y = self.actual_bird.y
+
+            self.wait = max(0, self.wait - 1)
+            print(self.wait)
+
             self.animation_timer_2 += 1
 
             if self.animation_timer_2 == 8:  
@@ -548,127 +555,138 @@ class App:
 
 
         elif self.mode == "bird_select":
-            pyxel.camera(0, 0)
-            
-            self.animation_timer += 1
-            if self.animation_timer > 15:
-                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
-                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
-                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
-                self.animation_timer = 0
+            if self.wait == 0:
+                pyxel.camera(0, 0)
+                
+                self.animation_timer += 1
+                if self.animation_timer > 15:
+                    self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                    self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                    self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                    self.animation_timer = 0
 
-            # Red bird button
-            if self.actual_bird == self.blue_bird:
-                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        if self.blue_orb >= 6:
-                            self.x, self.y = self.stele.tp_red()  # Red bird shrine position
+                # Red bird button
+                if self.actual_bird == self.blue_bird:
+                    if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            if self.blue_orb >= 6:
+                                self.x, self.y = self.stele.tp_red()  # Red bird shrine position
+                                self.actual_bird = self.red_bird
+                                self.red_bird.goto(self.stele.tp_red())
+                                self.mode = "game"
+                                if not self.red_bird in self.unlock:
+                                    self.unlock.append(self.red_bird)
+                            else:
+                                self.error_message = f"Besoin de {6 - self.blue_orb} orbes bleues en plus !"
+                                self.error_timer = 50
+                                
+                    # Green bird button
+                    if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            if self.red_orb >= 8:
+                                self.x, self.y = self.stele.tp_green()  # Green bird shrine position
+                                self.actual_bird = self.green_bird
+                                self.green_bird.goto(self.stele.tp_green())
+                                self.mode = "game"
+                                if not self.green_bird in self.unlock:
+                                    self.unlock.append(self.green_bird)
+                            else:
+                                self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
+                                self.error_timer = 50
+                
+                elif self.actual_bird == self.red_bird:
+
+                    if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            self.x, self.y = self.stele.tp_blue()  # Blue bird shrine position
+                            self.actual_bird = self.blue_bird
+                            self.blue_bird.goto(self.stele.tp_blue())
+                            self.mode = "game"
+                    
+                    # Green bird button
+                    if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            if self.red_orb >= 8:
+                                self.x, self.y = self.stele.tp_green()
+                                self.actual_bird = self.green_bird
+                                self.green_bird.goto(self.stele.tp_green())
+                                self.mode = "game"
+                                if not self.green_bird in self.unlock:
+                                    self.unlock.append(self.green_bird)                            
+                            else:
+                                self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
+                                self.error_timer = 50
+
+                elif self.actual_bird == self.green_bird:
+                    if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            self.x, self.y = self.stele.tp_red()
                             self.actual_bird = self.red_bird
                             self.red_bird.goto(self.stele.tp_red())
                             self.mode = "game"
-                            if not self.red_bird in self.unlock:
-                                self.unlock.append(self.red_bird)
-                        else:
-                            self.error_message = f"Besoin de {6 - self.blue_orb} orbes bleues en plus !"
-                            self.error_timer = 50
-                            
-                # Green bird button
-                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        if self.red_orb >= 8:
-                            self.x, self.y = self.stele.tp_green()  # Green bird shrine position
-                            self.actual_bird = self.green_bird
-                            self.green_bird.goto(self.stele.tp_green())
-                            self.mode = "game"
-                            if not self.green_bird in self.unlock:
-                                self.unlock.append(self.green_bird)
-                        else:
-                            self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
-                            self.error_timer = 50
-            
-            elif self.actual_bird == self.red_bird:
 
-                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        self.x, self.y = self.stele.tp_blue()  # Blue bird shrine position
-                        self.actual_bird = self.blue_bird
-                        self.blue_bird.goto(self.stele.tp_blue())
-                        self.mode = "game"
-                
-                # Green bird button
-                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        if self.red_orb >= 8:
-                            self.x, self.y = self.stele.tp_green()
-                            self.actual_bird = self.green_bird
-                            self.green_bird.goto(self.stele.tp_green())
-                            self.mode = "game"
-                            if not self.green_bird in self.unlock:
-                                self.unlock.append(self.green_bird)                            
-                        else:
-                            self.error_message = f"Besoin de {8 - self.red_orb} orbes rouges en plus !"
-                            self.error_timer = 50
+                    if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            self.x, self.y = self.stele.tp_blue()
+                            self.actual_bird = self.blue_bird
+                            self.blue_bird.goto(self.stele.tp_blue())
+                            self.mode = "game"    
+        
+                if pyxel.btnp(pyxel.KEY_R):
+                    self.mode = "game"
+                    self.wait = 100
 
-            elif self.actual_bird == self.green_bird:
-                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 130:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        self.x, self.y = self.stele.tp_red()
-                        self.actual_bird = self.red_bird
-                        self.red_bird.goto(self.stele.tp_red())
-                        self.mode = "game"
-
-                if 40 <= pyxel.mouse_x <= 216 and 150 <= pyxel.mouse_y <= 230:
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        self.x, self.y = self.stele.tp_blue()
-                        self.actual_bird = self.blue_bird
-                        self.blue_bird.goto(self.stele.tp_blue())
-                        self.mode = "game"    
-    
-            if pyxel.btnp(pyxel.KEY_R):
+            else:
                 self.mode = "game"
+                self.show_wait = True
+
 
 
         elif self.mode == "place_stele":
-            pyxel.camera(0, 0)
-            
-            self.animation_timer += 1
-            if self.animation_timer > 15:
-                self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
-                self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
-                self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
-                self.animation_timer = 0
+            if self.wait == 0:
+                pyxel.camera(0, 0)
+                
+                self.animation_timer += 1
+                if self.animation_timer > 15:
+                    self.bird1_frame = 1 - self.bird1_frame  # Toggle between 0 and 1
+                    self.bird2_frame = 1 - self.bird2_frame  # Toggle between 0 and 1
+                    self.bird3_frame = 1 - self.bird3_frame  # Toggle between 0 and 1
+                    self.animation_timer = 0
 
-            if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 100:
-                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                    self.stele.place_blue(self.actual_bird.x, self.actual_bird.y)
+                if 40 <= pyxel.mouse_x <= 216 and 50 <= pyxel.mouse_y <= 100:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        self.stele.place_blue(self.actual_bird.x, self.actual_bird.y)
+                        self.mode = "game"
+
+                            
+                if 40 <= pyxel.mouse_x <= 216 and 110 <= pyxel.mouse_y <= 160:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.blue_orb >= 10:
+                            self.stele.place_red(self.actual_bird.x, self.actual_bird.y)
+                            self.mode = "game"
+                            if not self.red_bird in self.unlock_stele:
+                                self.unlock_stele.append(self.red_bird)
+                        else:
+                            self.error_message = f"Besoin de {10 - self.blue_orb} orbes bleues en plus !"
+                            self.error_timer = 50
+                
+                if 40 <= pyxel.mouse_x <= 216 and 170 <= pyxel.mouse_y <= 220:
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.red_orb >= 15:
+                            self.stele.place_green(self.actual_bird.x, self.actual_bird.y)
+                            self.mode = "game"
+                            if not self.green_bird in self.unlock_stele:
+                                self.unlock_stele.append(self.green_bird)
+                        else:
+                            self.error_message = f"Besoin de {15 - self.red_orb} orbes rouges en plus !"
+                            self.error_timer = 50
+
+                if pyxel.btnp(pyxel.KEY_R):
                     self.mode = "game"
 
-                        
-            if 40 <= pyxel.mouse_x <= 216 and 110 <= pyxel.mouse_y <= 160:
-                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                    if self.blue_orb >= 10:
-                        self.stele.place_red(self.actual_bird.x, self.actual_bird.y)
-                        self.mode = "game"
-                        if not self.red_bird in self.unlock_stele:
-                            self.unlock_stele.append(self.red_bird)
-                    else:
-                        self.error_message = f"Besoin de {10 - self.blue_orb} orbes bleues en plus !"
-                        self.error_timer = 50
-            
-            if 40 <= pyxel.mouse_x <= 216 and 170 <= pyxel.mouse_y <= 220:
-                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                    if self.red_orb >= 15:
-                        self.stele.place_green(self.actual_bird.x, self.actual_bird.y)
-                        self.mode = "game"
-                        if not self.green_bird in self.unlock_stele:
-                            self.unlock_stele.append(self.green_bird)
-                    else:
-                        self.error_message = f"Besoin de {15 - self.red_orb} orbes rouges en plus !"
-                        self.error_timer = 50
-
-            if pyxel.btnp(pyxel.KEY_R):
+            else : 
                 self.mode = "game"
-
+                self.show_wait = True
 
         elif self.mode == "mort":
             if pyxel.btn(pyxel.KEY_R):
@@ -794,11 +812,25 @@ class App:
                     pyxel.rect(self.tombe.pos_rect3[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 2, self.tombe.pos_rect3[1], self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
                     pyxel.text(self.tombe.pos_rect3[0] + 10 , self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 2 + 10, self.tombe.message_3, 7)
                 
+                if hasattr(self.tombe, "message_4"):
+                    pyxel.rect(self.tombe.pos_rect4[0], self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 3, self.tombe.pos_rect4[1], self.tombe.taille_rect[1], pyxel.COLOR_BLACK)
+                    pyxel.text(self.tombe.pos_rect4[0] + 10 , self.tombe.pos_rect[1] + self.tombe.taille_rect[1] * 3 + 10, self.tombe.message_4, 7)
+
                 self.tombe.message_timer -= 1
                 if self.tombe.message_timer <= 0:
                     self.tombe.show_message = False
                     if not self.actual_bird.to_dict() in self.hommage:
                         self.hommage.append(self.actual_bird.to_dict())
+            
+            if self.show_wait:
+                pyxel.rect(20, 70, 230, 50, pyxel.COLOR_BLACK)
+                pyxel.text(30, 80, "Veuillez attendre quelques secondes avant de pouvoir", 7)
+                pyxel.text(70, 100, "reutiliser cette fonctionnalite", 7)
+                # self.wait_timer -= 1
+                # if self.wait_timer <= 0:
+                #     self.show_wait = False
+                #     self.wait_timer = 100
+
             self.actual_bird.draw_particles()
             self.tombe.draw_particles()
 
@@ -807,132 +839,134 @@ class App:
 
 
         elif self.mode == "bird_select":
-            pyxel.camera(0, 0)
+            if self.wait == 0:
+                pyxel.camera(0, 0)
 
-            if (30 <= pyxel.mouse_x <= 218 and 
-                20 <= pyxel.mouse_y <= 228):
-                pyxel.mouse(True)
-            else:
-                pyxel.mouse(False)
+                if (30 <= pyxel.mouse_x <= 218 and 
+                    20 <= pyxel.mouse_y <= 228):
+                    pyxel.mouse(True)
+                else:
+                    pyxel.mouse(False)
+                    
+                if self.error_timer > 0:
+                    self.error_timer -= 1
+
+                # Background
+                pyxel.rect(30, 20, 196, 216, 5)
+                pyxel.rectb(30, 20, 196, 216, 7)
                 
-            if self.error_timer > 0:
-                self.error_timer -= 1
+                # Title
+                title_x = 80
+                title_y = 55
+                for i, letter in enumerate("SELECT BIRD"):
+                    self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
 
-            # Background
-            pyxel.rect(30, 20, 196, 216, 5)
-            pyxel.rectb(30, 20, 196, 216, 7)
-            
-            # Title
-            title_x = 80
-            title_y = 55
-            for i, letter in enumerate("SELECT BIRD"):
-                self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
+                if self.actual_bird == self.blue_bird:
+                    # Red Bird Section
+                    pyxel.rect(40, 50, 176, 80, 8)
+                    pyxel.text(50, 60, "Red Bird", 7)
+                    pyxel.text(130, 60, "Necessaire : 6", 7) if not self.red_bird in self.unlock else None
+                    pyxel.blt(190, 59, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock else None
+                    pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
+                    pyxel.line(40, 100, 216, 100, 7)
+                    pyxel.text(50, 110, "Fast and agile", 7)
+                    
+                    # Green Bird Section
+                    pyxel.rect(40, 150, 176, 80, 8)
+                    pyxel.text(50, 160, "Green Bird", 7)
+                    pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
+                    pyxel.blt(190, 159, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
+                    pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
+                    pyxel.line(40, 200, 216, 200, 7)
+                    pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
+                    pyxel.text(50, 220, "une duree determinee", 7)
 
-            if self.actual_bird == self.blue_bird:
-                # Red Bird Section
-                pyxel.rect(40, 50, 176, 80, 8)
-                pyxel.text(50, 60, "Red Bird", 7)
-                pyxel.text(130, 60, "Necessaire : 6", 7) if not self.red_bird in self.unlock else None
-                pyxel.blt(190, 59, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock else None
-                pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
-                pyxel.line(40, 100, 216, 100, 7)
-                pyxel.text(50, 110, "Fast and agile", 7)
+                elif self.actual_bird == self.red_bird:
+                    # Red Bird Section
+                    pyxel.rect(40, 50, 176, 80, 8)
+                    pyxel.text(50, 60, "Blue Bird", 7)
+                    pyxel.blt(50, 80, 0, self.bird2_frame * 8, 16, 8, 8, 2)  # Red bird sprite
+                    pyxel.line(40, 100, 216, 100, 7)
+                    pyxel.text(50, 110, "Un oiseau bleu ?", 7)
+                    
+                    # Green Bird Section
+                    pyxel.rect(40, 150, 176, 80, 8)
+                    pyxel.text(50, 160, "Green Bird", 7)
+                    pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
+                    pyxel.blt(190, 159, 0, 0, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
+                    pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
+                    pyxel.line(40, 200, 216, 200, 7)
+                    pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
+                    pyxel.text(50, 220, "une duree determinee", 7)
+
+                elif self.actual_bird == self.green_bird:
+                    # Red Bird Section
+                    pyxel.rect(40, 50, 176, 80, 8)
+                    pyxel.text(50, 60, "Red Bird", 7)
+                    pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
+                    pyxel.line(40, 100, 216, 100, 7)
+                    pyxel.text(50, 110, "Fast and agile", 7)
+                    
+                    # Green Bird Section
+                    pyxel.rect(40, 150, 176, 80, 8)
+                    pyxel.text(50, 160, "Blue Bird", 7)
+                    pyxel.blt(50, 180, 0, self.bird3_frame * 8, 16, 8, 8, 2)  # Green bird sprite
+                    pyxel.line(40, 200, 216, 200, 7)
+                    pyxel.text(50, 210, "Un oiseau bleu ?", 7)
+
                 
-                # Green Bird Section
-                pyxel.rect(40, 150, 176, 80, 8)
-                pyxel.text(50, 160, "Green Bird", 7)
-                pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
-                pyxel.blt(190, 159, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
-                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
-                pyxel.line(40, 200, 216, 200, 7)
-                pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
-                pyxel.text(50, 220, "une duree determinee", 7)
-
-            elif self.actual_bird == self.red_bird:
-                # Red Bird Section
-                pyxel.rect(40, 50, 176, 80, 8)
-                pyxel.text(50, 60, "Blue Bird", 7)
-                pyxel.blt(50, 80, 0, self.bird2_frame * 8, 16, 8, 8, 2)  # Red bird sprite
-                pyxel.line(40, 100, 216, 100, 7)
-                pyxel.text(50, 110, "Un oiseau bleu ?", 7)
-                
-                # Green Bird Section
-                pyxel.rect(40, 150, 176, 80, 8)
-                pyxel.text(50, 160, "Green Bird", 7)
-                pyxel.text(130, 160, "Necessaire : 8", 7) if not self.green_bird in self.unlock else None
-                pyxel.blt(190, 159, 0, 0, 8, 8, 8, 2) if not self.green_bird in self.unlock else None
-                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 24, 8, 8, 2)  # Green bird sprite
-                pyxel.line(40, 200, 216, 200, 7)
-                pyxel.text(50, 210, "Peut marcher dans les airs pendant", 7)
-                pyxel.text(50, 220, "une duree determinee", 7)
-
-            elif self.actual_bird == self.green_bird:
-                # Red Bird Section
-                pyxel.rect(40, 50, 176, 80, 8)
-                pyxel.text(50, 60, "Red Bird", 7)
-                pyxel.blt(50, 80, 0, self.bird2_frame * 8 + 16, 24, 8, 8, 2)  # Red bird sprite
-                pyxel.line(40, 100, 216, 100, 7)
-                pyxel.text(50, 110, "Fast and agile", 7)
-                
-                # Green Bird Section
-                pyxel.rect(40, 150, 176, 80, 8)
-                pyxel.text(50, 160, "Blue Bird", 7)
-                pyxel.blt(50, 180, 0, self.bird3_frame * 8, 16, 8, 8, 2)  # Green bird sprite
-                pyxel.line(40, 200, 216, 200, 7)
-                pyxel.text(50, 210, "Un oiseau bleu ?", 7)
-
-            
-            # Error message
-            if self.error_timer > 0:
-                pyxel.rect(65, 110, 145, 20, pyxel.COLOR_PURPLE)
-                pyxel.text(70, 115, self.error_message, 7)        
+                # Error message
+                if self.error_timer > 0:
+                    pyxel.rect(65, 110, 145, 20, pyxel.COLOR_PURPLE)
+                    pyxel.text(70, 115, self.error_message, 7)        
 
 
         elif self.mode == "place_stele":
-            pyxel.camera(0, 0)
+            if self.wait == 0:
+                pyxel.camera(0, 0)
 
-            if (30 <= pyxel.mouse_x <= 218 and 
-                20 <= pyxel.mouse_y <= 228):
-                pyxel.mouse(True)
-            else:
-                pyxel.mouse(False)
+                if (30 <= pyxel.mouse_x <= 218 and 
+                    20 <= pyxel.mouse_y <= 228):
+                    pyxel.mouse(True)
+                else:
+                    pyxel.mouse(False)
+                    
+                if self.error_timer > 0:
+                    self.error_timer -= 1
+        
+                # Background
+                pyxel.rect(30, 20, 196, 216, 5)
+                pyxel.rectb(30, 20, 196, 216, 7)
                 
-            if self.error_timer > 0:
-                self.error_timer -= 1
-    
-            # Background
-            pyxel.rect(30, 20, 196, 216, 5)
-            pyxel.rectb(30, 20, 196, 216, 7)
-            
-            # Title
-            title_x = 80
-            title_y = 50
-            for i, letter in enumerate("PLACE STELE"):
-                self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
+                # Title
+                title_x = 80
+                title_y = 50
+                for i, letter in enumerate("PLACE STELE"):
+                    self.draw_letter(letter, title_x + i * 20, title_y, 0.5)
 
-            pyxel.rect(40, 50, 176, 50, 8)
-            pyxel.text(50, 60, "Blue Stele", 7)
-            pyxel.blt(50, 80, 0, 0, 72, 8, 8, 2)  # Red bird stele sprite
-            pyxel.blt(150, 80, 0, self.bird1_frame * 8, 16, -8, 8, 2)
+                pyxel.rect(40, 50, 176, 50, 8)
+                pyxel.text(50, 60, "Blue Stele", 7)
+                pyxel.blt(50, 80, 0, 0, 72, 8, 8, 2)  # Red bird stele sprite
+                pyxel.blt(150, 80, 0, self.bird1_frame * 8, 16, -8, 8, 2)
 
-            pyxel.rect(40, 110, 176, 50, 8)
-            pyxel.text(50, 120, "Red Stele", 7)
-            pyxel.text(130, 120, "Necessaire : 10", 7) if not self.red_bird in self.unlock_stele else None
-            pyxel.blt(190, 119, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock_stele else None
-            pyxel.blt(150, 140, 0, self.bird2_frame * 8 + 16, 24, -8, 8, 2)  # Red bird sprite
-            pyxel.blt(50, 140, 0, 8, 64, 8, 8, 2)  # Red bird stele sprite
+                pyxel.rect(40, 110, 176, 50, 8)
+                pyxel.text(50, 120, "Red Stele", 7)
+                pyxel.text(130, 120, "Necessaire : 10", 7) if not self.red_bird in self.unlock_stele else None
+                pyxel.blt(190, 119, 0, 0, 8, 8, 8, 2) if not self.red_bird in self.unlock_stele else None
+                pyxel.blt(150, 140, 0, self.bird2_frame * 8 + 16, 24, -8, 8, 2)  # Red bird sprite
+                pyxel.blt(50, 140, 0, 8, 64, 8, 8, 2)  # Red bird stele sprite
 
-            pyxel.rect(40, 170, 176, 50, 8)
-            pyxel.text(50, 180, "Green Stele", 7)
-            pyxel.text(130, 180, "Necessaire : 15", 7) if not self.green_bird in self.unlock_stele else None
-            pyxel.blt(190, 179, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock_stele else None
-            pyxel.blt(150, 200, 0, self.bird3_frame * 8, 24, -8, 8, 2)  # Green bird sprite
-            pyxel.blt(50, 200, 0, 0, 64, 8, 8, 2)  # Red bird stele sprite
+                pyxel.rect(40, 170, 176, 50, 8)
+                pyxel.text(50, 180, "Green Stele", 7)
+                pyxel.text(130, 180, "Necessaire : 15", 7) if not self.green_bird in self.unlock_stele else None
+                pyxel.blt(190, 179, 0, 8, 8, 8, 8, 2) if not self.green_bird in self.unlock_stele else None
+                pyxel.blt(150, 200, 0, self.bird3_frame * 8, 24, -8, 8, 2)  # Green bird sprite
+                pyxel.blt(50, 200, 0, 0, 64, 8, 8, 2)  # Red bird stele sprite
 
-            # Error message
-            if self.error_timer > 0:
-                pyxel.rect(65, 110, 150, 20, pyxel.COLOR_PURPLE)
-                pyxel.text(70, 115, self.error_message, 7)  
+                # Error message
+                if self.error_timer > 0:
+                    pyxel.rect(65, 110, 150, 20, pyxel.COLOR_PURPLE)
+                    pyxel.text(70, 115, self.error_message, 7)  
 
 
         elif self.mode == "mort":
@@ -951,6 +985,7 @@ class App:
 
             if pyxel.btn(pyxel.KEY_R):
                 self.mode = "game"
+
 
         elif self.mode == "pause" :
             pyxel.camera(0, 0)
@@ -1189,7 +1224,7 @@ class Bird1:
     """
     Classe de l'oiseau bleu
     """
-    def __init__(self, app, stele) -> None:
+    def __init__(self, app : object, stele : object) -> None:
         """
         Constructeur de la classe Bird1
         -------------------
@@ -1441,7 +1476,7 @@ class Bird1:
         return (self.x, self.y)
 
 
-    def goto(self, tuple_x_y) -> None:
+    def goto(self, tuple_x_y : tuple[int, int | float]) -> None:
         """
         Méthode qui permet de téléporter l'oiseau
         """
@@ -1470,7 +1505,7 @@ class Bird1:
 
 
 class Bird2:
-    def __init__(self, app, stele):
+    def __init__(self, app : object, stele : object) -> None:
         self.x = 0
         self.y = 0
         self.direction = "droite"
@@ -1693,7 +1728,7 @@ class Bird2:
         return (self.x, self.y)
     
 
-    def goto(self, tuple_x_y) -> None:
+    def goto(self, tuple_x_y : tuple[int, int | float]) -> None:
         self.x = tuple_x_y[0]
         self.y = tuple_x_y[1]
         self.teleport_jauge = 0
@@ -1712,7 +1747,7 @@ class Bird2:
 
 
 class Bird3:
-    def __init__(self, app, stele):
+    def __init__(self, app : object, stele : object) -> None:
         self.x = 0
         self.y = 0
         self.direction = "droite"
@@ -1931,7 +1966,7 @@ class Bird3:
         return (self.x, self.y)
 
 
-    def goto(self, tuple_x_y) -> None:
+    def goto(self, tuple_x_y : tuple[int, int | float]) -> None:
         self.x = tuple_x_y[0]
         self.y = tuple_x_y[1]
         self.teleport_jauge = 0
@@ -2007,17 +2042,17 @@ class Stele:
         pyxel.blt(self.green_x, self.green_y, 0, 0, 64, 8, 8, pyxel.COLOR_PURPLE)
 
 
-    def place_blue(self, x, y) -> None:
+    def place_blue(self, x : int, y : int | float) -> None:
         self.blue_x = x
         self.blue_y = y
 
 
-    def place_green(self, x, y) -> None:
+    def place_green(self, x : int, y : int | float) -> None:
         self.green_x = x
         self.green_y = y
     
 
-    def place_red(self, x, y) -> None:
+    def place_red(self, x : int, y : int | float) -> None:
         self.red_x = x
         self.red_y = y
 
@@ -2068,7 +2103,7 @@ class Tombe:
     """
     Classe pour la gestion de la tombe
     """
-    def __init__(self, app) -> None:
+    def __init__(self, app : object) -> None:
         """
         Constructeur de la classe
         -------------
@@ -2111,7 +2146,7 @@ class Tombe:
         self.particles = []
         
 
-    def check_collision_with_stele(self, bird) -> None:
+    def check_collision_with_stele(self, bird : object) -> None:
         """
         Verifie la collision avec la tombe et empeche l'oiseau de passer au travers.
         -----------------
@@ -2136,7 +2171,7 @@ class Tombe:
                                 else bird.goto(self.pyxel_egal_caca.stele.tp_green())
     
     
-    def check_homage(self, bird) -> None:
+    def check_homage(self, bird : object) -> None:
         """
         Vérifie si l'utilisateur appuie sur le 'h' et que l'oiseau est à proximité de la tombe.
         -----------------
@@ -2156,9 +2191,9 @@ class Tombe:
                 self.show_message = True
 
             else :
-                la_grosse_phrase = self.phrases_hommage[17]
+                la_grosse_phrase = random.choice(self.phrases_hommage)
 
-                self.message_timer = 100 
+                self.message_timer = 100
                 self.pos_rect = (30, 10)
                 self.taille_rect = (200, 30)
                 self.message = "Tu m'as deja rendu hommage, merci quand meme."
@@ -2222,50 +2257,50 @@ class Tombe:
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[10]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Je suis le gardien de ce passage, pour que d’autres puissent "
+                    self.message_3 = "avancer en paix. (mais je n'arrive plus a tenir)"
+                    self.pos_rect3 = (15, 205)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[11]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Mon existence ici a plus de sens quand on vient me voir. (mais"
+                    self.message_3 = "a-t-elle deja eu un sens ? pourquoi je suis comme ca ? je ne "
+                    self.pos_rect3 = (0, 256)
+                    self.message_4 = "suis pas bien...)"
+                    self.pos_rect4 = (85, 75)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[12]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Merci de respecter ce lieu sacre, tout le monde le fait pas."
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[13]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Restez prudents, je veille ici pour que rien de mal ne "
+                    self.message_3 = "survienne. (je peux pas dire que je vais lacher)"
+                    self.pos_rect3 = (15, 205)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[14]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Ce n'est pas facile de proteger cet endroit, mais ta "
+                    self.message_3 = "presence aide. (sans penser a cette autre presence)"
+                    self.pos_rect3 = (15, 215)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[15]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
+                    self.message_2 = "Je veille pour que la tranquillite regne ici, merci de me"
+                    self.message_3 = "le rappeler."
                     self.pos_rect3 = (100, 60)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[16]:
-                    self.message_2 = "la_grosse_phrase"
-                    self.message_3 = "garde pas."
-                    self.pos_rect3 = (100, 60)
+                    self.message_2 = "Rien n est plus precieux que le souvenir que vous m'offrez."
+                    self.message_3 = "(je commence a tout oublier, est-ce donc ca l au-dela ?...)"
+                    self.pos_rect3 = (5, 245)
                     self.show_message = True
                     self.message_timer = 160
                 elif la_grosse_phrase == self.phrases_hommage[17]:
-                    self.message_2 = "Parfois, la solitude est lourde ici, mais ton hommage adoucit cela. (je souhaite les rejoindre)"
-                    self.message_3 = "adoucit cela. (je souhaite les rejoindre) pas."
+                    self.message_2 = "Parfois, la solitude est lourde ici, mais ton hommage"
+                    self.message_3 = "adoucit cela. (je souhaite les rejoindre)"
                     self.pos_rect3 = (20, 200)
                     self.show_message = True
                     self.message_timer = 160
@@ -2307,10 +2342,6 @@ class Tombe:
                 screen_y = particle.y - self.pyxel_egal_caca.camera_y
                 pyxel.pset(screen_x, screen_y, random.choice([2, 8]))
 
-
-        
-
-
     def reset(self) -> None:
         """
         Méthode qui réinitialise les attributs de la classe
@@ -2325,7 +2356,7 @@ class Tombe:
         self.particles = []
 
 
- 
+
 
 class End:
     """
