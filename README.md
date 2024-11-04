@@ -40,7 +40,7 @@ Birdies est un jeu de plateforme et d'exploration en 2D développé avec Pyxel, 
 
 - ESPACE : Sauter
 
-- H : Rendre hommage (près de la tombe)
+- ~~H : Rendre hommage (près de la tombe) ?!?!?!?!?!~~
 
 - P : Placer une stèle
 
@@ -58,7 +58,7 @@ Birdies est un jeu de plateforme et d'exploration en 2D développé avec Pyxel, 
 
 <br>
 
-- <u> Capacités </u>: Saut de base, téléportation vers sa stèle
+- <u> Capacités </u>: Saut de base (x3), téléportation vers sa stèle
 - <u> Particularité </u>: Disponible dès le début
 
 <br>
@@ -81,17 +81,21 @@ Birdies est un jeu de plateforme et d'exploration en 2D développé avec Pyxel, 
 
 ---
 
-### Mécaniques de jeu
+### Mécaniques de jeu :
+
+<br>
 
 - Collecte d'orbes : Ramassez les orbes colorées pour débloquer de nouvelles capacités et zones
 
-- Système de stèles : Placez des stèles pour créer des points de téléportation
+- Système de stèles : Placez des stèles pour créer des points de téléportation (cooldown de 100 frames entre chaque placement)
 
 - ~~Hommage : Rendez hommage pour débloquer le passage final ?!?!?!~~
 
 - Exploration : Découvrez des zones cachées et des secrets
 
 - Puzzle environnemental : Utilisez les capacités des différents oiseaux pour progresser
+
+- Incarnez différents oiseaux : Choisissez entre l'oiseau bleu, rouge ou vert pour des capacités spéciales différentes !! (cooldown de 100 frames entre chaque changement d'oiseau)
 
 ---
 <br>
@@ -138,10 +142,22 @@ Gestion des dialogues et messages à l'écran
 
 ## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Installation et lancement</u></div>
 
-Assurez-vous d'avoir Python installé sur votre système.
-Installez Pyxel avec la commande : pip install pyxel
-Téléchargez les fichiers du jeu.
-Lancez le jeu en exécutant le fichier principal : python nom_du_fichier_principal.py
+- Assurez-vous d'avoir Python installé sur votre système.
+- Installez Pyxel avec la commande : 
+  ```bash
+  pip install pyxel
+  ```
+- Téléchargez les [fichiers du jeu](https://github.com/Cassssian/Projet3/archive/refs/heads/main.zip).
+- Lancez le jeu en exécutant le fichier principal : python nom_du_fichier_principal.py
+  
+OU
+
+- Téléchargez la [release](https://github.com/Cassssian/Birdies/releases/tag/v1.0)
+- Ouvrez le fichier .exe
+
+*(il y aura aussi un fichier .zip avec toutes les ressources nécessaires et le code dans la release si vous voulez le modifier ou regarder le code 🙃)*
+
+Et voilà !
 
 ---
 
@@ -157,7 +173,7 @@ La classe App contient la boucle de jeu principale et gère les transitions entr
 
 Le système de sauvegarde utilise JSON pour stocker les données de jeu.
 
-Les assets graphiques sont stockés dans un fichier Pyxres (.pyxres).
+Les assets graphiques et audio sont stockés dans un fichier Pyxres (.pyxres).
 
 ---
 
