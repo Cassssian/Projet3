@@ -152,7 +152,7 @@ Gestion des dialogues et messages à l'écran
   
 OU
 
-- Téléchargez la [release](https://github.com/Cassssian/Projet3/releases/tag/v1.0.0)
+- Téléchargez la [release](https://github.com/Cassssian/Projet3/releases/tag/v.1.0.0)
 - Ouvrez le fichier .exe
 
 *(il y aura aussi un fichier .zip avec toutes les ressources nécessaires et le code dans la release si vous voulez le modifier ou regarder le code 🙃)*
