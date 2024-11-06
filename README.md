@@ -199,3 +199,17 @@ Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou à
 ## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Auteur</u></div>
 
 - [DucceschKleinsansklien Industries®](https://github.com/Cassssian)
+
+---
+
+<br>
+
+## <div style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6em"><u>Aide</u></div>
+
+Si vous avez besoin d'aide, n'hésitez pas à regarder cette section : 
+
+- Pour l'orbe en dessous de la tombe, essayez d'avoir le jauge de téléportation remplie, puis, arrivé vers le bout du sol, appuyez sur la touche `T` pour téléporter tout en récupérant l'orbe. Veillez à bien être aligné avec l'orbe sinon vous n'allez pas récupérer l'orbe.
+
+- Pour l'orbe collé au mur, mettez vous bien aligné avec le mur, sauter, puis décalez-vous un peu vers la gauche. Si vous être bien placé, l'oiseau devrait se coller au mur et vous pourrez alors récupérer l'orbe en pressant la touche `Espace`.
+
+- Pour l'orbe qui est au milieu de la terre, veuillez rendre hommage à la tombe avec tout les oiseaux puis vous aurez un portail qui vous amènera à l'orbe. Pour revenir, vous avez juste à traverser l'autre côté du portail.

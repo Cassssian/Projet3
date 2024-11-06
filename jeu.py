@@ -391,6 +391,8 @@ class App:
         self.error_timer = 0
         self.win_music = False
         self.music = False
+        self.music_play = False
+        self.win_music_play = False
         # ================== END ===========================
 
         # ============== ANIMATIONS ==========================
@@ -431,6 +433,7 @@ class App:
         self.wait_timer = 0
         self.show_timer = 40
         self.partie_en_cours = False
+        self.reset_done = False
         # =============== END =======================
         
 
@@ -473,6 +476,13 @@ class App:
         Méthode qui gère les mises à jour du jeu
         """
         if self.mode == "menu":
+            self.music = self.win_music = False
+            self.music_play = self.win_music_play = False
+
+            if not self.reset_done:
+                self.reset("menu")
+                self.reset_done = True
+                pyxel.load("1.pyxres")
             self.animation_timer += 1
             self.animation_timer_2 += 1
             if self.animation_timer > 15:
@@ -498,8 +508,8 @@ class App:
             
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 if self.is_button_clicked(self.button_start):
-                    self.reset()
-                    self.mode = "game"
+                    self.reset("game")
+                    self.reset_done = False
                 elif self.is_button_clicked(self.sauvegarde):
                     self.save_class.scroll_position = 0
                     self.save_class.click_ignore = True
@@ -599,7 +609,6 @@ class App:
 
 
             if not self.music:
-                pyxel.playm(0, loop=True)
                 self.music = True
 
 
@@ -749,7 +758,7 @@ class App:
 
         elif self.mode == "mort":
             if pyxel.btn(pyxel.KEY_R):
-                self.reset()
+                self.reset("game")
 
 
         elif self.mode == "pause":
@@ -762,10 +771,27 @@ class App:
             pyxel.camera(0, 0)
             pyxel.cls(0)
             if not self.win_music:
-                pyxel.playm(1, loop=True)
                 self.win_music = True
             if pyxel.btnp(pyxel.KEY_R):
-                self.reset()
+                self.reset("game")
+
+        self.play()
+
+
+    def play(self) -> None:
+        """
+        Méthode qui gère la musique du jeu
+        """
+        if self.music and not self.music_play:
+            pyxel.playm(0, loop=True)
+            self.music_play = True
+        
+        elif self.win_music and not self.win_music_play:
+            pyxel.playm(1, loop=True)
+            self.win_music_play = True
+
+        elif not self.music and not self.win_music_play:
+            pyxel.stop()
 
 
     def draw(self) -> None:
@@ -1256,10 +1282,13 @@ class App:
                 button["y"] <= pyxel.mouse_y <= button["y"] + button["h"])
 
 
-    def reset(self) -> None:
+    def reset(self, mode) -> None:
         """
         Méthode qui permet de reset le jeu
+        -------------------
+        mode : mode de jeu
         """
+        pyxel.load("1.pyxres")
         self.blue_bird.reset()
         self.green_bird.reset()
         self.red_bird.reset()
@@ -1281,7 +1310,9 @@ class App:
         self.partie_en_cours = False
         self.music = False
         self.win_music = False
-        self.mode = "menu"
+        self.music_play = False
+        self.win_music_play = False
+        self.mode = mode
         self.x = 0
         self.y = 0
         self.camera_x = 0
@@ -1419,6 +1450,7 @@ class Bird1:
             
             else:
                 if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                    self.teleport_jauge = 0
                     self.goto(self.stele.tp_blue())
                 self.is_charging = False
                 self.tp_charge = max(0, self.tp_charge - 1)
@@ -1430,6 +1462,7 @@ class Bird1:
 
         else:
             if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.teleport_jauge = 0
                 self.goto(self.stele.tp_blue())
             self.is_charging = False
             self.tp_charge = max(0, self.tp_charge - 1)
@@ -1728,6 +1761,7 @@ class Bird2:
             else:
                 if self.is_charging and self.tp_charge >= self.tp_max_charge:
                     self.goto(self.stele.tp_red())
+                    self.teleport_jauge = 0
                 self.is_charging = False
                 self.tp_charge = max(0, self.tp_charge - 1)
                 if self.waiting >= 20:
@@ -1738,6 +1772,7 @@ class Bird2:
 
         else:
             if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.teleport_jauge = 0
                 self.goto(self.stele.tp_red())
             self.is_charging = False
             self.tp_charge = max(0, self.tp_charge - 1)
@@ -1782,8 +1817,8 @@ class Bird2:
         new_x : position x du zoiseaux
         """
         
-        top_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, self.y // 8)  # Coin supérieur droit
-        bottom_tile = pyxel.tilemaps[0].pget((new_x + 6 + self.def_speed) // 8, (self.y + 7) // 8)  # Coin inférieur droit
+        top_tile = pyxel.tilemaps[0].pget((new_x + self.def_speed + 4) // 8, self.y // 8)  # Coin supérieur droit
+        bottom_tile = pyxel.tilemaps[0].pget((new_x + self.def_speed + 4) // 8, (self.y + 7) // 8)  # Coin inférieur droit
 
         # Si l'une des tuiles à droite est un obstacle (collide), il y a une collision
         return top_tile not in self.pyxel_egal_caca.COLLIDERS and bottom_tile not in self.pyxel_egal_caca.COLLIDERS
@@ -2052,6 +2087,7 @@ class Bird3:
             else:
                 if self.is_charging and self.tp_charge >= self.tp_max_charge:
                     self.goto(self.stele.tp_green())
+                    self.teleport_jauge = 0
                 self.is_charging = False
                 self.tp_charge = max(0, self.tp_charge - 1)
                 if self.waiting_particles >= 20:
@@ -2062,6 +2098,7 @@ class Bird3:
 
         else:
             if self.is_charging and self.tp_charge >= self.tp_max_charge:
+                self.teleport_jauge = 0
                 self.goto(self.stele.tp_green())
             self.is_charging = False
             self.tp_charge = max(0, self.tp_charge - 1)
