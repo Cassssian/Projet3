@@ -1320,7 +1320,7 @@ class App:
         self.bird1_frame = 0
         self.bird2_frame = 0
         self.bird3_frame = 0
-        self.blue_orb = 0
+        self.blue_orb = 99
         self.red_orb = 0
         self.green_orb = 0
         self.error_message = ""
@@ -1663,7 +1663,7 @@ class Bird2:
         self.jump_strength = -2.5
         self.frame = 0
         self.pyxel_egal_caca = app
-        self.def_speed = 3
+        self.def_speed = 4
         self.tp_charge = 0
         self.tp_max_charge = 104
         self.is_charging = False

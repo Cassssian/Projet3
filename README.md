@@ -152,7 +152,7 @@ Gestion des dialogues et messages à l'écran
   
 OU
 
-- Téléchargez la [release](https://github.com/Cassssian/Projet3/releases/tag/v.1.0.0)
+- Téléchargez la [release](https://github.com/Cassssian/Projet3/releases/tag/v.1.0.1)
 - Ouvrez le fichier .exe
 
 *(il y aura aussi un fichier .zip avec toutes les ressources nécessaires et le code dans la release si vous voulez le modifier ou regarder le code 🙃)*
@@ -210,6 +210,6 @@ Si vous avez besoin d'aide, n'hésitez pas à regarder cette section :
 
 - Pour l'orbe en dessous de la tombe, essayez d'avoir le jauge de téléportation remplie, puis, arrivé vers le bout du sol, appuyez sur la touche `T` pour téléporter tout en récupérant l'orbe. Veillez à bien être aligné avec l'orbe sinon vous n'allez pas récupérer l'orbe.
 
-- Pour l'orbe collé au mur, mettez vous bien aligné avec le mur, sauter, puis décalez-vous un peu vers la gauche. Si vous être bien placé, l'oiseau devrait se coller au mur et vous pourrez alors récupérer l'orbe en pressant la touche `Espace`.
+- Pour l'orbe collé au mur, mettez vous bien aligné avec le mur *(le dessin de l'oiseau doit être parfaitement alignés avec le bord gauche du mur)*, et puis sautez. Si vous être bien placé, l'oiseau devrait se coller au mur et vous pourrez alors récupérer l'orbe en montant avec la touche `Espace`. Puis pour vous décollez, décalez-vous vers la gauche.
 
 - Pour l'orbe qui est au milieu de la terre, veuillez rendre hommage à la tombe avec tout les oiseaux puis vous aurez un portail qui vous amènera à l'orbe. Pour revenir, vous avez juste à traverser l'autre côté du portail.
