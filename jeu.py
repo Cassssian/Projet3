@@ -570,9 +570,7 @@ class App:
                 if self.animation_timer > 15:
                     self.actual_bird.frame = (self.actual_bird.frame + 1) % 2
                     self.animation_timer = 0
-
-            if pyxel.btnp(pyxel.KEY_X):
-                self.mode = "win"
+                    
 
             if pyxel.btn(pyxel.KEY_C):
                 if self.actual_bird.check_collision_below(self.actual_bird.y):
