@@ -159,7 +159,139 @@ class Save:
         try:
             with open(self.__save_file, "r") as f:
                 saves_json = json.load(f)
-        
+
+            # Calculate scroll
+            max_visible_saves = 4  # Adjusted for smaller window
+            if not hasattr(self, 'scroll_position'):
+                self.scroll_position = 0
+                
+            if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.KEY_S):
+                self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
+            if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.KEY_Z):
+                self.scroll_position = max(0, self.scroll_position - 1)
+                
+            # Draw save buttons with scroll
+            visible_saves = saves_json[self.scroll_position:self.scroll_position + max_visible_saves]
+            for i, save in enumerate(visible_saves):
+                button_y = 70 + i * 40
+                # Draw button background
+                date = save["Date"]
+                button_save = {"x": 40, "y": button_y, "w": 176, "h": 30}
+                self.__pyxel_egal_caca.draw_button(button_save, f"Save {save['Partie']} - {date[0]}/{date[1]}/{date[2]} a {date[3][0]}h {date[3][1]}min {date[3][2]}s")
+
+                if self.__pyxel_egal_caca.is_button_clicked(button_save):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and len(visible_saves) == 1:
+
+                                    self.__pyxel_egal_caca.reset("None")
+                                    self.__pyxel_egal_caca.partie_en_cours = save["Partie"]
+                                    self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
+                                    self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
+                                    self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
+                                    self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
+                                    self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
+                                    self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
+                                    self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
+                                    self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
+                                    self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
+                                    self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
+                                    self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
+                                    self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
+                                    self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
+                                    self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
+                                    self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
+                                    self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
+                                    self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
+                                    self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
+                                    self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
+                                    self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.blue_bird.teleport_jauge = save["Teleport_charge"][0] 
+                                    self.__pyxel_egal_caca.red_bird.teleport_jauge = save["Teleport_charge"][1]
+                                    self.__pyxel_egal_caca.green_bird.teleport_jauge = save["Teleport_charge"][2]
+                                    self.__pyxel_egal_caca.hommage = save["Hommage"]
+                                    self.__pyxel_egal_caca.items_blue = save["Items"][0]
+                                    self.__pyxel_egal_caca.items_red = save["Items"][1]
+                                    self.__pyxel_egal_caca.items_green = save["Items"][2]
+
+
+                                    self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
+                                    self.click_ignore = True
+                                    self.__pyxel_egal_caca.mode = "game"
+
+                                elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.click_ignore and len(visible_saves) != 1:
+
+                                    self.__pyxel_egal_caca.reset("None")
+                                    self.__pyxel_egal_caca.partie_en_cours = save["Partie"]
+                                    self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
+                                    self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
+                                    self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
+                                    self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
+                                    self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
+                                    self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
+                                    self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
+                                    self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
+                                    self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
+                                    self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
+                                    self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
+                                    self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
+                                    self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
+                                    self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
+                                    self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
+                                    self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
+                                    self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
+                                    self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
+                                    self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
+                                    self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
+                                    self.__pyxel_egal_caca.blue_bird.teleport_jauge = save["Teleport_charge"][0] 
+                                    self.__pyxel_egal_caca.red_bird.teleport_jauge = save["Teleport_charge"][1]
+                                    self.__pyxel_egal_caca.green_bird.teleport_jauge = save["Teleport_charge"][2]
+                                    self.__pyxel_egal_caca.hommage = save["Hommage"]
+                                    self.__pyxel_egal_caca.items_blue = save["Items"][0]
+                                    self.__pyxel_egal_caca.items_red = save["Items"][1]
+                                    self.__pyxel_egal_caca.items_green = save["Items"][2]
+
+
+                                    self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
+                                    self.click_ignore = True
+                                    self.__pyxel_egal_caca.mode = "game"
+
+                                elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.click_ignore and len(visible_saves) != 1:
+                                    self.click_ignore = False
+                        
+            # Draw scroll indicators if needed
+            if self.scroll_position > 0:
+
+                high_button = {"x": 217, "y": 69, "w": 8, "h": 9}
+                self.__pyxel_egal_caca.draw_button(high_button, "    ")
+                if self.__pyxel_egal_caca.is_button_clicked(high_button):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                    self.scroll_position = max(0, self.scroll_position - 1)
+                pyxel.tri(
+                            220, 70,  # sommet du triangle
+                            218, 75,  # coin gauche
+                            222, 75,  # coin droit
+                            7  # couleur blanche
+                        )
+            if self.scroll_position + max_visible_saves < len(saves_json):
+
+                high_button = {"x": 217, "y": 212, "w": 8, "h": 9}
+                self.__pyxel_egal_caca.draw_button(high_button, "    ")
+                if self.__pyxel_egal_caca.is_button_clicked(high_button):
+                                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                                    self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
+                pyxel.tri(
+                            220, 219,  # sommet inversé
+                            218, 214,  # coin gauche
+                            222, 214,  # coin droit
+                            7  # couleur blanche
+                        )
+            
+            # Back button
+            back_button = {"x": 140, "y": 30, "w": 80, "h": 20}
+            self.__pyxel_egal_caca.draw_button(back_button, "Retour")
+            if self.__pyxel_egal_caca.is_button_clicked(back_button):
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    self.__pyxel_egal_caca.mode = "menu"
+
         except:
             pyxel.text(80, 100, "Pas de sauvegarde trouvee", 7)
             pyxel.text(70, 110, "Veuillez effectuer une partie", 7)
@@ -178,138 +310,6 @@ class Save:
             if self.__pyxel_egal_caca.is_button_clicked(back_button):
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.__pyxel_egal_caca.mode = "menu"
-
-        # Calculate scroll
-        max_visible_saves = 4  # Adjusted for smaller window
-        if not hasattr(self, 'scroll_position'):
-            self.scroll_position = 0
-            
-        if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.KEY_S):
-            self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
-        if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.KEY_Z):
-            self.scroll_position = max(0, self.scroll_position - 1)
-            
-        # Draw save buttons with scroll
-        visible_saves = saves_json[self.scroll_position:self.scroll_position + max_visible_saves]
-        for i, save in enumerate(visible_saves):
-            button_y = 70 + i * 40
-            # Draw button background
-            date = save["Date"]
-            button_save = {"x": 40, "y": button_y, "w": 176, "h": 30}
-            self.__pyxel_egal_caca.draw_button(button_save, f"Save {save['Partie']} - {date[0]}/{date[1]}/{date[2]} a {date[3][0]}h {date[3][1]}min {date[3][2]}s")
-
-            if self.__pyxel_egal_caca.is_button_clicked(button_save):
-                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and len(visible_saves) == 1:
-
-                                self.__pyxel_egal_caca.reset("None")
-                                self.__pyxel_egal_caca.partie_en_cours = save["Partie"]
-                                self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
-                                self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
-                                self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
-                                self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
-                                self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
-                                self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
-                                self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
-                                self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
-                                self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
-                                self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
-                                self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
-                                self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
-                                self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
-                                self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
-                                self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
-                                self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
-                                self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
-                                self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
-                                self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
-                                self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
-                                self.__pyxel_egal_caca.blue_bird.teleport_jauge = save["Teleport_charge"][0] 
-                                self.__pyxel_egal_caca.red_bird.teleport_jauge = save["Teleport_charge"][1]
-                                self.__pyxel_egal_caca.green_bird.teleport_jauge = save["Teleport_charge"][2]
-                                self.__pyxel_egal_caca.hommage = save["Hommage"]
-                                self.__pyxel_egal_caca.items_blue = save["Items"][0]
-                                self.__pyxel_egal_caca.items_red = save["Items"][1]
-                                self.__pyxel_egal_caca.items_green = save["Items"][2]
-
-
-                                self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
-                                self.click_ignore = True
-                                self.__pyxel_egal_caca.mode = "game"
-
-                            elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.click_ignore and len(visible_saves) != 1:
-
-                                self.__pyxel_egal_caca.reset("None")
-                                self.__pyxel_egal_caca.partie_en_cours = save["Partie"]
-                                self.__pyxel_egal_caca.blue_orb = save["Orbes"][0]
-                                self.__pyxel_egal_caca.red_orb = save["Orbes"][1]
-                                self.__pyxel_egal_caca.green_orb = save["Orbes"][2]
-                                self.__pyxel_egal_caca.x, self.__pyxel_egal_caca.y = save["Pos Pos_cam"][0]
-                                self.__pyxel_egal_caca.camera_x, self.__pyxel_egal_caca.camera_y = save["Pos Pos_cam"][1]
-                                self.__pyxel_egal_caca.actual_bird = self.deserialisation(save["Actual bird"])
-                                self.__pyxel_egal_caca.unlock = [self.deserialisation(classe) for classe in save["Unlocked"][0]]
-                                self.__pyxel_egal_caca.unlock_stele = [self.deserialisation(classe) for classe in save["Unlocked"][1]]
-                                self.__pyxel_egal_caca.blue_bird.x = save["Bird pos"][0][0]
-                                self.__pyxel_egal_caca.blue_bird.y = save["Bird pos"][0][1]
-                                self.__pyxel_egal_caca.red_bird.x = save["Bird pos"][1][0]
-                                self.__pyxel_egal_caca.red_bird.y = save["Bird pos"][1][1]
-                                self.__pyxel_egal_caca.green_bird.x = save["Bird pos"][2][0]
-                                self.__pyxel_egal_caca.green_bird.y = save["Bird pos"][2][1]
-                                self.__pyxel_egal_caca.stele.blue_x = save["Stele pos"][0][0]
-                                self.__pyxel_egal_caca.stele.blue_y = save["Stele pos"][0][1]
-                                self.__pyxel_egal_caca.stele.red_x = save["Stele pos"][1][0]
-                                self.__pyxel_egal_caca.stele.red_y = save["Stele pos"][1][1]
-                                self.__pyxel_egal_caca.stele.green_x = save["Stele pos"][2][0]
-                                self.__pyxel_egal_caca.stele.green_y = save["Stele pos"][2][1]
-                                self.__pyxel_egal_caca.blue_bird.teleport_jauge = save["Teleport_charge"][0] 
-                                self.__pyxel_egal_caca.red_bird.teleport_jauge = save["Teleport_charge"][1]
-                                self.__pyxel_egal_caca.green_bird.teleport_jauge = save["Teleport_charge"][2]
-                                self.__pyxel_egal_caca.hommage = save["Hommage"]
-                                self.__pyxel_egal_caca.items_blue = save["Items"][0]
-                                self.__pyxel_egal_caca.items_red = save["Items"][1]
-                                self.__pyxel_egal_caca.items_green = save["Items"][2]
-
-
-                                self.restore_items(save["Items"][0], save["Items"][1], save["Items"][2])
-                                self.click_ignore = True
-                                self.__pyxel_egal_caca.mode = "game"
-
-                            elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.click_ignore and len(visible_saves) != 1:
-                                self.click_ignore = False
-                    
-        # Draw scroll indicators if needed
-        if self.scroll_position > 0:
-
-            high_button = {"x": 217, "y": 69, "w": 8, "h": 9}
-            self.__pyxel_egal_caca.draw_button(high_button, "    ")
-            if self.__pyxel_egal_caca.is_button_clicked(high_button):
-                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                                self.scroll_position = max(0, self.scroll_position - 1)
-            pyxel.tri(
-                        220, 70,  # sommet du triangle
-                        218, 75,  # coin gauche
-                        222, 75,  # coin droit
-                        7  # couleur blanche
-                    )
-        if self.scroll_position + max_visible_saves < len(saves_json):
-
-            high_button = {"x": 217, "y": 212, "w": 8, "h": 9}
-            self.__pyxel_egal_caca.draw_button(high_button, "    ")
-            if self.__pyxel_egal_caca.is_button_clicked(high_button):
-                            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                                self.scroll_position = min(len(saves_json) - max_visible_saves, self.scroll_position + 1)
-            pyxel.tri(
-                        220, 219,  # sommet inversé
-                        218, 214,  # coin gauche
-                        222, 214,  # coin droit
-                        7  # couleur blanche
-                    )
-        
-        # Back button
-        back_button = {"x": 140, "y": 30, "w": 80, "h": 20}
-        self.__pyxel_egal_caca.draw_button(back_button, "Retour")
-        if self.__pyxel_egal_caca.is_button_clicked(back_button):
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.__pyxel_egal_caca.mode = "menu"
                 
 
 
