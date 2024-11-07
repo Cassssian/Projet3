@@ -571,6 +571,9 @@ class App:
                     self.actual_bird.frame = (self.actual_bird.frame + 1) % 2
                     self.animation_timer = 0
 
+            if pyxel.btnp(pyxel.KEY_X):
+                self.mode = "win"
+
             if pyxel.btn(pyxel.KEY_C):
                 if self.actual_bird.check_collision_below(self.actual_bird.y):
                     if self.error_timer > 0:
@@ -772,6 +775,7 @@ class App:
             pyxel.cls(0)
             if not self.win_music:
                 self.win_music = True
+                self.music = False
             if pyxel.btnp(pyxel.KEY_R):
                 self.reset("game")
 
@@ -2712,8 +2716,8 @@ class End:
         and stele.get_stele()[0][1] == self.by and stele.get_stele()[1][0] == self.rx and stele.get_stele()[1][1] == self.ry \
         and stele.get_stele()[2][0] == self.gx and stele.get_stele()[2][1] == self.gy:
             
+            self.pyxel_egal_caca.reset("None")
             self.pyxel_egal_caca.mode = "win"
-            self.pyxel_egal_caca.reset()
 
         elif blue != self.blue and red == self.red and green == self.green and blue_bird.get_pos()[0] == self.bx \
         and blue_bird.get_pos()[1] == self.by and red_bird.get_pos()[0] == self.rx and red_bird.get_pos()[1] == self.ry \
