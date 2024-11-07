@@ -1320,7 +1320,7 @@ class App:
         self.bird1_frame = 0
         self.bird2_frame = 0
         self.bird3_frame = 0
-        self.blue_orb = 99
+        self.blue_orb = 0
         self.red_orb = 0
         self.green_orb = 0
         self.error_message = ""
